@@ -67,6 +67,7 @@ public class CameraController : MonoBehaviour
     public void LookAt(Transform target)
     {
         _target = target;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void UpdateStaminaDisplay(float value, bool cooldown)
