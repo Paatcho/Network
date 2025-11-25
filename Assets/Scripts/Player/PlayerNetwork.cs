@@ -54,6 +54,19 @@ public class PlayerNetwork : NetworkBehaviour, IPlayerDataListener
             Quaternion.identity);
         _spawnedObject.Spawn(true);
     }
+    
+    public void OnCrushed()
+    {
+        if (!IsOwner) return;
+        
+        DieRpc();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void DieRpc()
+    {
+        controller.Die();
+    }
 
     public void UpdatePlayerData(PlayerData playerData)
     {

@@ -3,15 +3,20 @@ using UnityEngine;
 
 public class PlayerView : MonoBehaviour
 {
+    private static readonly int BumpMap = Shader.PropertyToID("_BumpMap");
     private const int RotationSplit = 8;
     private const int FullRotation = 360;
-    private const float AnimTimerMax = 0.3f;
+    private const float AnimTimerMax = 0.4f;
     private const float RotationSection = FullRotation / (float)RotationSplit;
+
+    [SerializeField] private Texture2D normalMap;
+    [SerializeField] private Texture2D invertedNormalMap;
 
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private ParticleSystem exhaustionParticleSystem;
     
     [SerializeField] private Sprite[] sprites;
+    [SerializeField] private Vector3 walkAnimationPosition = new(0, 0.05f);
     
     private Camera _camera;
 
@@ -26,6 +31,10 @@ public class PlayerView : MonoBehaviour
     private void Update()
     {
         transform.LookAt(_camera.transform);
+        
+        bool yInverted = Vector3.Angle(transform.forward, Vector3.forward) <= 90;
+        
+        spriteRenderer.material.SetTexture(BumpMap, yInverted ? invertedNormalMap : normalMap);
     }
 
     public void UpdateView(float velocity)
@@ -47,7 +56,7 @@ public class PlayerView : MonoBehaviour
     
     private void SetPosition()
     {
-        transform.localPosition = _animUp ? new Vector3(0f, 0.1f) : Vector3.zero;
+        transform.localPosition = _animUp ? walkAnimationPosition : Vector3.zero;
     }
 
     public void UpdateDirection(Vector3 direction)
@@ -73,7 +82,20 @@ public class PlayerView : MonoBehaviour
     private Sprite YawToSprite(float yaw)
     {
         int index = (int)(Mathf.Repeat(yaw + RotationSection / 2f, FullRotation) / RotationSection);
+
+        Sprite result;
         
-        return sprites[index];
+        try
+        {
+            result = sprites[index];
+        }
+        catch
+        {
+            Debug.LogError("Invalid sprite index : " + index);
+            Debug.LogError(yaw);
+            throw;
+        }
+        
+        return result;
     }
 }

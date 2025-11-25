@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     private Transform _cam;
     private bool _exhausted;
     private IPlayerDataListener _network;
-
+    private Vector3 _spawnPosition;
     private float _stamina = 1f;
 
     private float Stamina
@@ -29,12 +29,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private bool Run => Input.GetKey(KeyCode.LeftShift);
+    private static bool Run => Input.GetKey(KeyCode.LeftShift);
 
     public void Init(IPlayerDataListener playerDataListener)
     {
         _cam = CameraController.instance.transform;
         CameraController.instance.LookAt(transform);
+        _spawnPosition = transform.position;
         _network = playerDataListener;
     }
 
@@ -94,5 +95,15 @@ public class PlayerController : MonoBehaviour
             Direction = moveInput,
             Velocity = rb.linearVelocity.magnitude
         });
+    }
+
+    public void Die()
+    {
+        Respawn();
+    }
+
+    private void Respawn()
+    {
+        transform.position = _spawnPosition;
     }
 }
