@@ -1,4 +1,5 @@
-using System;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,8 +9,12 @@ public class CameraController : MonoBehaviour
 
     [SerializeField] private Slider staminaDisplay;
     [SerializeField] private Image staminaDisplayFill;
+    [SerializeField] private TMP_Text title;
+    [SerializeField] private TMP_Text subtitle;
 
     private Transform _target;
+    private Tween _titleTween;
+    private Tween _subtitleTween;
 
     private void Awake()
     {
@@ -25,6 +30,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float wallOffset = 0.1f;
     [SerializeField] private Color staminaBaseColor;
     [SerializeField] private Color staminaCooldownColor;
+    [SerializeField] private float textFadeTime = 2f;
 
     private float _rotationX;
     private float _rotationY;
@@ -74,5 +80,24 @@ public class CameraController : MonoBehaviour
     {
         staminaDisplay.value = value;
         staminaDisplayFill.color = cooldown ? staminaCooldownColor : staminaBaseColor;
+    }
+
+    private void SetField(TMP_Text field, string text)
+    {
+        field.text = text;
+        field.alpha = 1f;
+        field.DOFade(0f, textFadeTime).SetEase(Ease.InExpo);
+    }
+
+    public void SetTitle(string text)
+    {
+        _titleTween.Kill();
+        SetField(title, text);
+    }
+
+    public void SetSubtitle(string text)
+    {
+        _subtitleTween.Kill();
+        SetField(subtitle, text);
     }
 }

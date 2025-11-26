@@ -4886,6 +4886,7 @@ MonoBehaviour:
   invertedNormalMap: {fileID: 2800000, guid: 8b1b0f8fce657db468e2a50a3fc2c5a2, type: 3}
   spriteRenderer: {fileID: 3167688935050237439}
   exhaustionParticleSystem: {fileID: 8505837351531950374}
+  crushedPrefab: {fileID: 9063063066753903704, guid: 2449b33086efcdc4da586a07f85b98a1, type: 3}
   sprites:
   - {fileID: 1616654916, guid: e0124195b89d113459a7621e4b19279d, type: 3}
   - {fileID: 18347388, guid: e0124195b89d113459a7621e4b19279d, type: 3}
@@ -4975,6 +4976,7 @@ MonoBehaviour:
   prefab: {fileID: 7876065308000765859, guid: 9f88cae9517411a4d98217b61b1e691f, type: 3}
   controller: {fileID: 2789501886289759898}
   view: {fileID: 6516563303314428307}
+  networkTransform: {fileID: 6343297642010879143}
 --- !u!114 &2789501886289759898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4988,6 +4990,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   rb: {fileID: 2081448091304608336}
+  coll: {fileID: 5408245148816595862}
   moveSpeed: 8
   runMoveSpeed: 16
   rotationSpeed: 5
@@ -4995,6 +4998,8 @@ MonoBehaviour:
   staminaDischargeRate: 0.2
   exhaustionThreshold: 0.1
   exhaustionEndThreshold: 0.5
+  deathCooldownTime: 5
+  spawnPosition: {x: 0, y: 0.25, z: 0}
 --- !u!114 &6343297642010879143
 MonoBehaviour:
   m_ObjectHideFlags: 0

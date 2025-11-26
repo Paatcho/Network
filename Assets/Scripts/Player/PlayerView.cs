@@ -1,5 +1,9 @@
 using System;
+using System.Numerics;
+using DG.Tweening;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 public class PlayerView : MonoBehaviour
 {
@@ -14,18 +18,19 @@ public class PlayerView : MonoBehaviour
 
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private ParticleSystem exhaustionParticleSystem;
+    [SerializeField] private CrushedMouse crushedPrefab;
     
     [SerializeField] private Sprite[] sprites;
     [SerializeField] private Vector3 walkAnimationPosition = new(0, 0.05f);
     
     private Camera _camera;
-
     private bool _animUp;
     private float _animTimer;
 
     private void Start()
     {
         _camera = Camera.main;
+        transform.localPosition = Vector3.zero;
     }
 
     private void Update()
@@ -40,6 +45,7 @@ public class PlayerView : MonoBehaviour
     public void UpdateView(float velocity)
     {
         _animTimer += velocity * Time.deltaTime;
+        
         if (_animTimer > AnimTimerMax)
         {
             _animTimer = 0f;
@@ -69,6 +75,23 @@ public class PlayerView : MonoBehaviour
     public void SetExhausted(bool value)
     {
         exhaustionParticleSystem.gameObject.SetActive(value);
+    }
+
+    public void Die(PlayerNetwork.DeathType deathType)
+    {
+        switch (deathType)
+        {
+            case PlayerNetwork.DeathType.Crushed:
+                Instantiate(crushedPrefab, transform.position + Vector3.down * 0.24f, Quaternion.identity);
+                break;
+            case PlayerNetwork.DeathType.Default:
+                break;
+        }
+    }
+
+    public void OnRespawn()
+    {
+        
     }
 
     private Sprite DirectionToSprite(Vector3 direction)

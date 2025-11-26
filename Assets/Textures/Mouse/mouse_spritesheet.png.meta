@@ -144,12 +144,12 @@ TextureImporter:
       name: mouse_crushed
       rect:
         serializedVersion: 2
-        x: 50
-        y: 116
-        width: 25
-        height: 12
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 98
+        y: 100
+        width: 29
+        height: 26
+      alignment: 9
+      pivot: {x: 0.4827586, y: 0.53846157}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

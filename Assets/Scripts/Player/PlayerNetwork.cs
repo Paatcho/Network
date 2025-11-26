@@ -1,19 +1,28 @@
-using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
-public class PlayerNetwork : NetworkBehaviour, IPlayerDataListener
+public class PlayerNetwork : NetworkBehaviour
 {
+    public enum DeathType
+    {
+        Default,
+        Crushed
+    }
+    
     [SerializeField] private NetworkObject prefab;
     [SerializeField] private PlayerController controller;
     [SerializeField] private PlayerView view;
+    [SerializeField] private NetworkTransform networkTransform;
 
     private readonly NetworkVariable<PlayerData> _playerData = new(
         new PlayerData
         {
             Exhausted = false,
             Direction = Vector3.forward,
-            Velocity = 0f
+            Velocity = 0f,
+            Dead = false,
+            
         },
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
@@ -54,18 +63,27 @@ public class PlayerNetwork : NetworkBehaviour, IPlayerDataListener
             Quaternion.identity);
         _spawnedObject.Spawn(true);
     }
+
+    [Rpc(SendTo.Everyone)]
+    public void OnRespawnRpc()
+    {
+        view.OnRespawn();
+    }
     
     public void OnCrushed()
     {
         if (!IsOwner) return;
         
-        DieRpc();
+        DieRpc(DeathType.Crushed);
     }
 
     [Rpc(SendTo.Everyone)]
-    private void DieRpc()
+    private void DieRpc(DeathType deathType = DeathType.Default)
     {
-        controller.Die();
+        if (_playerData.Value.Dead) return;
+
+        view.Die(deathType);
+        if (IsOwner) controller.Die();
     }
 
     public void UpdatePlayerData(PlayerData playerData)
@@ -74,6 +92,13 @@ public class PlayerNetwork : NetworkBehaviour, IPlayerDataListener
             playerData.Direction == Vector3.zero ? _playerData.Value.Direction : playerData.Direction;
         _playerData.Value = playerData;
     }
+
+    [Rpc(SendTo.Everyone)]
+    public void TeleportRpc(Vector3 position)
+    {
+        print(position);
+        networkTransform.Teleport(position, Quaternion.identity, Vector3.one);
+    }
 }
 
 public struct PlayerData : INetworkSerializable
@@ -81,16 +106,13 @@ public struct PlayerData : INetworkSerializable
     public bool Exhausted;
     public Vector3 Direction;
     public float Velocity;
+    public bool Dead;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref Exhausted);
         serializer.SerializeValue(ref Direction);
         serializer.SerializeValue(ref Velocity);
+        serializer.SerializeValue(ref Dead);
     }
-}
-
-public interface IPlayerDataListener
-{
-    public void UpdatePlayerData(PlayerData playerData);
 }
