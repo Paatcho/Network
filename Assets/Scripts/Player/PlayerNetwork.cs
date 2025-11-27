@@ -7,7 +7,8 @@ public class PlayerNetwork : NetworkBehaviour
     public enum DeathType
     {
         Default,
-        Crushed
+        Crushed,
+        Explosion
     }
     
     [SerializeField] private NetworkObject prefab;
@@ -45,6 +46,11 @@ public class PlayerNetwork : NetworkBehaviour
         if (IsOwner)
         {
             controller.Move();
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                EnterHole();
+            }
         } 
     }
 
@@ -70,11 +76,11 @@ public class PlayerNetwork : NetworkBehaviour
         view.OnRespawn();
     }
     
-    public void OnCrushed()
+    public void Die(DeathType deathType = DeathType.Default)
     {
         if (!IsOwner) return;
         
-        DieRpc(DeathType.Crushed);
+        DieRpc(deathType);
     }
 
     [Rpc(SendTo.Everyone)]
@@ -86,6 +92,11 @@ public class PlayerNetwork : NetworkBehaviour
         if (IsOwner) controller.Die();
     }
 
+    public void PickUpCollectible(Collectible.CollectibleType collectibleType)
+    {
+        
+    }
+
     public void UpdatePlayerData(PlayerData playerData)
     {
         playerData.Direction =
@@ -93,11 +104,24 @@ public class PlayerNetwork : NetworkBehaviour
         _playerData.Value = playerData;
     }
 
-    [Rpc(SendTo.Everyone)]
+    [Rpc(SendTo.Me)]
     public void TeleportRpc(Vector3 position)
     {
-        print(position);
         networkTransform.Teleport(position, Quaternion.identity, Vector3.one);
+    }
+
+    private void EnterHole()
+    {
+        if (!controller.CurrentHole) return;
+        
+        controller.CurrentHole.Enter(controller);
+    }
+
+    public void EnableController(bool value)
+    {
+        if (!IsOwner) return;
+        
+        controller.EnableController(value);
     }
 }
 

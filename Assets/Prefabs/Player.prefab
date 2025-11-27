@@ -4863,7 +4863,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: -1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4291535407130243857}
@@ -4887,6 +4887,7 @@ MonoBehaviour:
   spriteRenderer: {fileID: 3167688935050237439}
   exhaustionParticleSystem: {fileID: 8505837351531950374}
   crushedPrefab: {fileID: 9063063066753903704, guid: 2449b33086efcdc4da586a07f85b98a1, type: 3}
+  explosionPrefab: {fileID: 8668344231347108288, guid: 20e0f51c19c21bb49b4e37f23754e9a8, type: 3}
   sprites:
   - {fileID: 1616654916, guid: e0124195b89d113459a7621e4b19279d, type: 3}
   - {fileID: 18347388, guid: e0124195b89d113459a7621e4b19279d, type: 3}
@@ -4912,6 +4913,8 @@ GameObject:
   - component: {fileID: 6343297642010879143}
   - component: {fileID: 2081448091304608336}
   - component: {fileID: 5408245148816595862}
+  - component: {fileID: 6289986686543208393}
+  - component: {fileID: 1661259902117709119}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -4929,10 +4932,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: -0}
-  m_LocalScale: {x: 1, y: 1, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4182656412524336697}
+  - {fileID: 820171066572145600}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4636031781451903091
@@ -5000,6 +5004,7 @@ MonoBehaviour:
   exhaustionEndThreshold: 0.5
   deathCooldownTime: 5
   spawnPosition: {x: 0, y: 0.25, z: 0}
+  jumpStrength: 5
 --- !u!114 &6343297642010879143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5094,6 +5099,104 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.25
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6289986686543208393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7187974373630988430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 0
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
+--- !u!114 &1661259902117709119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7187974373630988430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7fc1a10029a13443a3c1298e033f37e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Billboarding
+--- !u!1 &7493608519322274125
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 820171066572145600}
+  - component: {fileID: 7829325273037033703}
+  - component: {fileID: 5840017495132841722}
+  m_Layer: 0
+  m_Name: Crush Trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &820171066572145600
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7493608519322274125}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.316, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4724767358293849706}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &7829325273037033703
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7493608519322274125}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.2
+  m_Height: 0.51
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5840017495132841722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7493608519322274125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57f3abe55227f7f488ab7abdfc71eb49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  player: {fileID: 1219826187876870210}
 --- !u!1 &8389409763014711114
 GameObject:
   m_ObjectHideFlags: 0

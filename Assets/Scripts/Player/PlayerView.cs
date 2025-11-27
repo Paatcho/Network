@@ -19,6 +19,7 @@ public class PlayerView : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private ParticleSystem exhaustionParticleSystem;
     [SerializeField] private CrushedMouse crushedPrefab;
+    [SerializeField] private Explosion explosionPrefab;
     
     [SerializeField] private Sprite[] sprites;
     [SerializeField] private Vector3 walkAnimationPosition = new(0, 0.05f);
@@ -35,8 +36,6 @@ public class PlayerView : MonoBehaviour
 
     private void Update()
     {
-        transform.LookAt(_camera.transform);
-        
         bool yInverted = Vector3.Angle(transform.forward, Vector3.forward) <= 90;
         
         spriteRenderer.material.SetTexture(BumpMap, yInverted ? invertedNormalMap : normalMap);
@@ -83,6 +82,9 @@ public class PlayerView : MonoBehaviour
         {
             case PlayerNetwork.DeathType.Crushed:
                 Instantiate(crushedPrefab, transform.position + Vector3.down * 0.24f, Quaternion.identity);
+                break;
+            case PlayerNetwork.DeathType.Explosion:
+                Instantiate(explosionPrefab, transform.position, Quaternion.identity);
                 break;
             case PlayerNetwork.DeathType.Default:
                 break;

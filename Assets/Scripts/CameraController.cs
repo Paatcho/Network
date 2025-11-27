@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float rotationSpeed = 2f;
     [SerializeField] private float height = 0.8f;
     [SerializeField] private float distance = 3f;
-    [SerializeField] private float minAngle = -20f;
+    [SerializeField] private float minAngle = 20f;
     [SerializeField] private float maxAngle = 20f;
     [SerializeField] private LayerMask obstructionMask;
     [SerializeField] private float wallOffset = 0.1f;

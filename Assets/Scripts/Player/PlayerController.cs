@@ -16,12 +16,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float exhaustionEndThreshold = 0.5f;
     [SerializeField] private int deathCooldownTime = 5;
     [SerializeField] private Vector3 spawnPosition;
+    [SerializeField] private float jumpStrength = 100;
 
     private CameraController _cam;
     private bool _exhausted;
     private PlayerNetwork _network;
     private float _stamina = 1f;
     private bool _deathCooldown;
+    
+    public MouseHole CurrentHole { get; set; }
 
     private float Stamina
     {
@@ -55,6 +58,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            #region Horizontal Movement
+            
             bool isRunning;
 
             if (Stamina >= exhaustionThreshold)
@@ -71,7 +76,7 @@ public class PlayerController : MonoBehaviour
                 _exhausted = true;
                 isRunning = false;
             }
-
+            
             float horizontalInput = Input.GetAxis("Horizontal");
             float verticalInput = Input.GetAxis("Vertical");
 
@@ -100,13 +105,24 @@ public class PlayerController : MonoBehaviour
             Stamina = isRunning && moveInput != Vector3.zero
                 ? Math.Max(Stamina - staminaDischargeRate * Time.deltaTime, 0f)
                 : Math.Min(Stamina + staminaRechargeRate * Time.deltaTime, 1f);
+            
+            #endregion
+            
+            #region Vertical Movement
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                rb.AddForce(Vector3.up * jumpStrength, ForceMode.Impulse);
+            }
+            
+            #endregion
         }
 
         _network.UpdatePlayerData(new PlayerData
         {
             Exhausted = _exhausted,
             Direction = moveInput,
-            Velocity = rb.linearVelocity.magnitude,
+            Velocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude,
             Dead = _deathCooldown
         });
     }
@@ -119,10 +135,8 @@ public class PlayerController : MonoBehaviour
     private IEnumerator RespawnCoroutine()
     {
         _deathCooldown = true;
-        rb.isKinematic = true;
-        coll.enabled = false;
-        _network.TeleportRpc(spawnPosition);
-        transform.position = spawnPosition;
+        EnableController(false);
+        Teleport(spawnPosition);
         
         for (int cooldown = deathCooldownTime; cooldown > 0; cooldown -= 1)
         {
@@ -134,11 +148,21 @@ public class PlayerController : MonoBehaviour
         Respawn();
     }
 
+    public void Teleport(Vector3 position)
+    {
+        _network.TeleportRpc(position);
+    }
+
     private void Respawn()
     {
         _deathCooldown = false;
-        rb.isKinematic = false;
-        coll.enabled = true;
+        EnableController(true);
         _network.OnRespawnRpc();
+    }
+
+    public void EnableController(bool value)
+    {
+        rb.isKinematic = !value;
+        coll.enabled = value;
     }
 }

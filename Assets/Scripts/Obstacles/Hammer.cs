@@ -36,7 +36,7 @@ public class Hammer : NetworkBehaviour
     {
         if (_isHit)
         {
-            player.OnCrushed();
+            player.Die(PlayerNetwork.DeathType.Crushed);
         }
     }
 }
