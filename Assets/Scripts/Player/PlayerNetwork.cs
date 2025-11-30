@@ -28,6 +28,11 @@ public class PlayerNetwork : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
 
+    private readonly NetworkVariable<int> _lives = new(
+        5, 
+        NetworkVariableReadPermission.Everyone, 
+        NetworkVariableWritePermission.Owner);
+
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
@@ -80,21 +85,41 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner) return;
         
-        DieRpc(deathType);
+        DieServerRpc(deathType);
     }
 
-    [Rpc(SendTo.Everyone)]
-    private void DieRpc(DeathType deathType = DeathType.Default)
+    [ServerRpc]
+    private void DieServerRpc(DeathType deathType)
     {
         if (_playerData.Value.Dead) return;
 
+        PlayerManager.Instance.LooseLife((int)OwnerClientId);
+
+        DieClientRpc(deathType);
+
+        _playerData.Value = new PlayerData { Dead = true };
+    }
+    
+    [ClientRpc]
+    private void DieClientRpc(DeathType deathType)
+    {
         view.Die(deathType);
-        if (IsOwner) controller.Die();
+
+        if (IsOwner)
+            controller.Die();
     }
 
-    public void PickUpCollectible(Collectible.CollectibleType collectibleType)
+    [ServerRpc]
+    public void PickUpCollectibleServerRpc(Collectible.CollectibleType collectibleType)
     {
-        
+        switch (collectibleType)
+        {
+            case Collectible.CollectibleType.Cheese:
+                PlayerManager.Instance.AddCollectible((int)OwnerClientId, collectibleType);
+                break;
+            case Collectible.CollectibleType.Crumb:
+                break;
+        }
     }
 
     public void UpdatePlayerData(PlayerData playerData)
@@ -115,13 +140,6 @@ public class PlayerNetwork : NetworkBehaviour
         if (!controller.CurrentHole) return;
         
         controller.CurrentHole.Enter(controller);
-    }
-
-    public void EnableController(bool value)
-    {
-        if (!IsOwner) return;
-        
-        controller.EnableController(value);
     }
 }
 

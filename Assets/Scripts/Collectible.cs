@@ -6,7 +6,7 @@ public class Collectible : MonoBehaviour
     public enum CollectibleType
     {
         Cheese,
-        Crumbs
+        Crumb
     }
     
     [SerializeField] private CollectibleType type;
@@ -15,7 +15,7 @@ public class Collectible : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            PlayerNetwork player = other.gameObject.GetComponent<PlayerNetwork>();
+            var player = other.gameObject.GetComponent<PlayerController>();
             player.PickUpCollectible(type);
             Destroy(gameObject);
         }

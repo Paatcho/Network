@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -5,21 +6,13 @@ using UnityEngine.UI;
 
 public class CameraController : MonoBehaviour
 {
-    public static CameraController instance;
+    public static CameraController Instance;
 
     [SerializeField] private Slider staminaDisplay;
     [SerializeField] private Image staminaDisplayFill;
     [SerializeField] private TMP_Text title;
     [SerializeField] private TMP_Text subtitle;
-
-    private Transform _target;
-    private Tween _titleTween;
-    private Tween _subtitleTween;
-
-    private void Awake()
-    {
-        instance = this;
-    }
+    [SerializeField] private Transform playerList;
 
     [SerializeField] private float rotationSpeed = 2f;
     [SerializeField] private float height = 0.8f;
@@ -32,8 +25,17 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Color staminaCooldownColor;
     [SerializeField] private float textFadeTime = 2f;
 
+
+    private Transform _target;
+    private Tween _titleTween;
+    private Tween _subtitleTween;
     private float _rotationX;
     private float _rotationY;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Update()
     {

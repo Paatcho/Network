@@ -49,19 +49,14 @@ public class PlayerView : MonoBehaviour
         {
             _animTimer = 0f;
             _animUp = !_animUp;
-            SetPosition();
+            transform.localPosition = _animUp ? walkAnimationPosition : Vector3.zero;
         }
 
         if (velocity == 0f)
         {
             _animUp = false;
-            SetPosition();
+            transform.localPosition = Vector3.zero;
         }
-    }
-    
-    private void SetPosition()
-    {
-        transform.localPosition = _animUp ? walkAnimationPosition : Vector3.zero;
     }
 
     public void UpdateDirection(Vector3 direction)
@@ -78,6 +73,8 @@ public class PlayerView : MonoBehaviour
 
     public void Die(PlayerNetwork.DeathType deathType)
     {
+        spriteRenderer.enabled = false;
+        
         switch (deathType)
         {
             case PlayerNetwork.DeathType.Crushed:
@@ -93,34 +90,28 @@ public class PlayerView : MonoBehaviour
 
     public void OnRespawn()
     {
-        
+        spriteRenderer.enabled = true;
     }
 
+    #region Direction
+    
     private Sprite DirectionToSprite(Vector3 direction)
     {
         Quaternion rotation = Quaternion.LookRotation(direction);
         float yaw = rotation.eulerAngles.y;
         yaw -= _camera.transform.rotation.eulerAngles.y;
-        return YawToSprite(yaw);
+
+        Sprite sprite = YawToSprite(yaw);
+        
+        return sprite ? sprite : spriteRenderer.sprite;
     }
 
     private Sprite YawToSprite(float yaw)
     {
         int index = (int)(Mathf.Repeat(yaw + RotationSection / 2f, FullRotation) / RotationSection);
 
-        Sprite result;
-        
-        try
-        {
-            result = sprites[index];
-        }
-        catch
-        {
-            Debug.LogError("Invalid sprite index : " + index);
-            Debug.LogError(yaw);
-            throw;
-        }
-        
-        return result;
+        return index < sprites.Length ? sprites[index] : null;
     }
+    
+    #endregion
 }

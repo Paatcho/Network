@@ -40,8 +40,8 @@ public class PlayerController : MonoBehaviour
 
     public void Init(PlayerNetwork playerNetwork)
     {
-        _cam = CameraController.instance;
-        CameraController.instance.LookAt(transform);
+        _cam = CameraController.Instance;
+        CameraController.Instance.LookAt(transform);
         transform.position = spawnPosition;
         _network = playerNetwork;
     }
@@ -136,7 +136,6 @@ public class PlayerController : MonoBehaviour
     {
         _deathCooldown = true;
         EnableController(false);
-        Teleport(spawnPosition);
         
         for (int cooldown = deathCooldownTime; cooldown > 0; cooldown -= 1)
         {
@@ -145,7 +144,7 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
 
-        Respawn();
+        StartCoroutine(Respawn());
     }
 
     public void Teleport(Vector3 position)
@@ -153,9 +152,11 @@ public class PlayerController : MonoBehaviour
         _network.TeleportRpc(position);
     }
 
-    private void Respawn()
+    private IEnumerator Respawn()
     {
         _deathCooldown = false;
+        Teleport(spawnPosition);
+        yield return null;
         EnableController(true);
         _network.OnRespawnRpc();
     }
@@ -164,5 +165,10 @@ public class PlayerController : MonoBehaviour
     {
         rb.isKinematic = !value;
         coll.enabled = value;
+    }
+
+    public void PickUpCollectible(Collectible.CollectibleType collectibleType)
+    {
+        _network.PickUpCollectibleServerRpc(collectibleType);
     }
 }
