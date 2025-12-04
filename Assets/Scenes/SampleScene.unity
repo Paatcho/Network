@@ -896,7 +896,7 @@ MonoBehaviour:
   maxAngle: 20
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   wallOffset: 0.1
   staminaBaseColor: {r: 0, g: 0.8784314, b: 0.16470589, a: 1}
   staminaCooldownColor: {r: 1, g: 0.2950937, b: 0, a: 1}
@@ -4687,7 +4687,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 315879933239724104, guid: 8bb68f2638311874ba45b21c5108203e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -13.83
       objectReference: {fileID: 0}
     - target: {fileID: 315879933239724104, guid: 8bb68f2638311874ba45b21c5108203e, type: 3}
       propertyPath: m_LocalPosition.y

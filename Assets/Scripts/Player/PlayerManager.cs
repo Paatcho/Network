@@ -4,12 +4,12 @@ public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance { get; private set; }
 
-    public NetworkList<PlayerInfo> players;
+    public NetworkList<PlayerInfo> Players;
 
     private void Awake()
     {
         Instance = this;
-        players = new NetworkList<PlayerInfo>();
+        Players = new NetworkList<PlayerInfo>();
     }
 
     public override void OnNetworkSpawn()
@@ -30,16 +30,16 @@ public class PlayerManager : NetworkBehaviour
             lives = 5
         };
 
-        players.Add(newPlayer);
+        Players.Add(newPlayer);
     }
 
     public void AddCollectible(int playerId, Collectible.CollectibleType collectibleType)
     {
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < Players.Count; i++)
         {
-            if (players[i].playerId == playerId)
+            if (Players[i].playerId == playerId)
             {
-                PlayerInfo p = players[i];
+                PlayerInfo p = Players[i];
 
                 switch (collectibleType)
                 {
@@ -48,7 +48,7 @@ public class PlayerManager : NetworkBehaviour
                         break;
                 }
                 
-                players[i] = p;
+                Players[i] = p;
                 break;
             }
         }
@@ -56,15 +56,15 @@ public class PlayerManager : NetworkBehaviour
 
     public void LooseLife(int playerId)
     {
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < Players.Count; i++)
         {
-            if (players[i].playerId == playerId)
+            if (Players[i].playerId == playerId)
             {
-                PlayerInfo p = players[i];
+                PlayerInfo p = Players[i];
                 
                 p.lives--;
                 
-                players[i] = p;
+                Players[i] = p;
                 break;
             }
         }

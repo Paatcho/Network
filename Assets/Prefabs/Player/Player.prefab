@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4291535407130243857}
   - component: {fileID: 8505837351531950374}
   - component: {fileID: 1210291103322448555}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4846,7 +4846,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4182656412524336697}
   - component: {fileID: 6516563303314428307}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4915,7 +4915,7 @@ GameObject:
   - component: {fileID: 5408245148816595862}
   - component: {fileID: 6289986686543208393}
   - component: {fileID: 1661259902117709119}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4951,7 +4951,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1975128928
+  GlobalObjectIdHash: 72300748
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5139,7 +5139,7 @@ GameObject:
   - component: {fileID: 820171066572145600}
   - component: {fileID: 7829325273037033703}
   - component: {fileID: 5840017495132841722}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Crush Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5207,7 +5207,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7753880903922901221}
   - component: {fileID: 3167688935050237439}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sprite Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -10,7 +10,7 @@ public class PlayerListUI : MonoBehaviour
 
     private void Start()
     {
-        PlayerManager.Instance.players.OnListChanged += OnPlayersChanged;
+        //PlayerManager.Instance.Players.OnListChanged += OnPlayersChanged;
     }
 
     private void OnPlayersChanged(NetworkListEvent<PlayerInfo> change)
