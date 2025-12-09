@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int deathCooldownTime = 5;
     [SerializeField] private Vector3 spawnPosition;
     [SerializeField] private float jumpStrength = 100;
+    [SerializeField] private float horizontalDampingFactor = 5f;
 
     private CameraController _cam;
     private bool _exhausted;
@@ -40,15 +41,15 @@ public class PlayerController : MonoBehaviour
 
     public void Init(PlayerNetwork playerNetwork)
     {
-        _cam = CameraController.Instance;
-        CameraController.Instance.LookAt(transform);
+        _cam = CameraController.instance;
+        CameraController.instance.LookAt(transform);
         transform.position = spawnPosition;
         _network = playerNetwork;
     }
 
     public void Move()
     {
-        if (!_cam) return;
+        if (!_cam || rb.isKinematic) return;
 
         Vector3 moveInput = Vector3.zero;
         
@@ -116,6 +117,15 @@ public class PlayerController : MonoBehaviour
             }
             
             #endregion
+            
+            Vector3 v = rb.linearVelocity;
+
+            float y = v.y;
+
+            Vector3 horizontal = new Vector3(v.x, 0, v.z);
+            horizontal *= horizontalDampingFactor;
+
+            rb.linearVelocity = horizontal + Vector3.up * y;
         }
 
         _network.UpdatePlayerData(new PlayerData
@@ -155,6 +165,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator Respawn()
     {
         _deathCooldown = false;
+        EnableController(false);
         Teleport(spawnPosition);
         yield return null;
         EnableController(true);
@@ -169,6 +180,7 @@ public class PlayerController : MonoBehaviour
 
     public void PickUpCollectible(Collectible.CollectibleType collectibleType)
     {
-        _network.PickUpCollectibleServerRpc(collectibleType);
+        print(_network);
+        _network.PickUpCollectibleRpc(collectibleType);
     }
 }

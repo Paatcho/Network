@@ -16,7 +16,7 @@ public class Explosion : MonoBehaviour
 
     private void Update()
     {
-        transform.LookAt(CameraController.Instance.transform);
+        transform.LookAt(CameraController.instance.transform);
     }
 
     private IEnumerator Explode()

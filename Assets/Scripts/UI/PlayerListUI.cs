@@ -2,15 +2,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class PlayerListUI : MonoBehaviour
+public class PlayerListUI : NetworkBehaviour
 {
     [SerializeField] private PlayerCard playerCardPrefab;
 
-    private readonly Dictionary<int, PlayerCard> _cards = new();
+    private readonly Dictionary<int, PlayerCard> cards = new();
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        //PlayerManager.Instance.Players.OnListChanged += OnPlayersChanged;
+        PlayerManager.Instance.Players.OnListChanged += OnPlayersChanged;
+        
+        print("list");
+
+        RebuildUI();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (PlayerManager.Instance != null)
+            PlayerManager.Instance.Players.OnListChanged -= OnPlayersChanged;
+    }
+
+    private void RebuildUI()
+    {
+        foreach (Transform child in transform)
+            Destroy(child.gameObject);
+
+        cards.Clear();
+        
+        print("Rebuilding UI");
+
+        foreach (var p in PlayerManager.Instance.Players)
+        {
+            print(p.name);
+            CreateCard(p);
+        }
     }
 
     private void OnPlayersChanged(NetworkListEvent<PlayerInfo> change)
@@ -20,9 +46,11 @@ public class PlayerListUI : MonoBehaviour
             case NetworkListEvent<PlayerInfo>.EventType.Add:
                 CreateCard(change.Value);
                 break;
+
             case NetworkListEvent<PlayerInfo>.EventType.Value:
                 UpdateCard(change.Value);
                 break;
+
             case NetworkListEvent<PlayerInfo>.EventType.Remove:
                 RemoveCard(change.Value.playerId);
                 break;
@@ -33,23 +61,24 @@ public class PlayerListUI : MonoBehaviour
     {
         var card = Instantiate(playerCardPrefab, transform);
         card.Init(info.name.ToString(), info.cheese, info.lives);
-        _cards.Add(info.playerId, card);
+        cards[info.playerId] = card;
     }
 
     private void UpdateCard(PlayerInfo info)
     {
-        if (!_cards.TryGetValue(info.playerId, out var card)) return;
-
-        card.UpdatePlayerCheeses(info.cheese);
-        card.UpdatePlayerLives(info.lives);
+        if (cards.TryGetValue(info.playerId, out var card))
+        {
+            card.UpdatePlayerCheeses(info.cheese);
+            card.UpdatePlayerLives(info.lives);
+        }
     }
 
     private void RemoveCard(int playerId)
     {
-        if (_cards.TryGetValue(playerId, out var card))
+        if (cards.TryGetValue(playerId, out var card))
         {
             Destroy(card.gameObject);
-            _cards.Remove(playerId);
+            cards.Remove(playerId);
         }
     }
 }

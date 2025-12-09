@@ -11,7 +11,6 @@ public class PlayerNetwork : NetworkBehaviour
         Explosion
     }
     
-    [SerializeField] private NetworkObject prefab;
     [SerializeField] private PlayerController controller;
     [SerializeField] private PlayerView view;
     [SerializeField] private NetworkTransform networkTransform;
@@ -28,15 +27,11 @@ public class PlayerNetwork : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
 
-    private readonly NetworkVariable<int> _lives = new(
-        5, 
-        NetworkVariableReadPermission.Everyone, 
-        NetworkVariableWritePermission.Owner);
-
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
+            print("burrrrr");
             controller.Init(this);
         }
 
@@ -59,22 +54,6 @@ public class PlayerNetwork : NetworkBehaviour
         } 
     }
 
-    private NetworkObject _spawnedObject;
-
-    [Rpc(SendTo.Server)]
-    private void DestroyObjectRpc()
-    {
-        _spawnedObject.Despawn();
-    }
-
-    [Rpc(SendTo.Server)]
-    private void TestRpc()
-    {
-        _spawnedObject = Instantiate(prefab, transform.position + new Vector3(0, Random.Range(2, 8), 0),
-            Quaternion.identity);
-        _spawnedObject.Spawn(true);
-    }
-
     [Rpc(SendTo.Everyone)]
     public void OnRespawnRpc()
     {
@@ -93,7 +72,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (_playerData.Value.Dead) return;
 
-        PlayerManager.Instance.LooseLife((int)OwnerClientId);
+        PlayerManager.Instance.LoseLife((int)OwnerClientId);
 
         DieClientRpc(deathType);
 
@@ -109,13 +88,13 @@ public class PlayerNetwork : NetworkBehaviour
             controller.Die();
     }
 
-    [ServerRpc]
-    public void PickUpCollectibleServerRpc(Collectible.CollectibleType collectibleType)
+    [Rpc(SendTo.Everyone)]
+    public void PickUpCollectibleRpc(Collectible.CollectibleType collectibleType)
     {
         switch (collectibleType)
         {
             case Collectible.CollectibleType.Cheese:
-                PlayerManager.Instance.AddCollectible((int)OwnerClientId, collectibleType);
+                PlayerManager.Instance.CollectCheese((int)OwnerClientId);
                 break;
             case Collectible.CollectibleType.Crumb:
                 break;

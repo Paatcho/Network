@@ -7,7 +7,7 @@ public class Billboarding : MonoBehaviour
 
     private void Start()
     {
-        _cam = CameraController.Instance;
+        _cam = CameraController.instance;
     }
 
     void Update()

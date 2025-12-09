@@ -33,21 +33,16 @@ public class CrushedMouse : MonoBehaviour
         Destroy(gameObject);
     }
     
-    private Tween TweenBounce(float squishDuration = 0.1f, float recoverDuration = 0.4f)
+    private void TweenBounce(float squishDuration = 0.1f)
     {
         Sequence seq = DOTween.Sequence();
 
-        Vector3 startScale = transform.localScale;
         Vector3 squishScale = new Vector3(1.7f, 1.7f, 1f);
 
         seq.Append(
             transform.DOScale(squishScale, squishDuration).SetEase(Ease.OutQuad)
         );
 
-        seq.Append(
-            transform.DOScale(startScale, recoverDuration).SetEase(Ease.OutElastic, 2f)
-        );
-
-        return seq.Play();
+        seq.Play();
     }
 }

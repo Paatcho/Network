@@ -17,6 +17,14 @@ public struct PlayerInfo : INetworkSerializable, IEquatable<PlayerInfo>
         serializer.SerializeValue(ref lives);
     }
 
+    public PlayerInfo(int id, string name, int cheese, int lives)
+    {
+        playerId = id;
+        this.name = name;
+        this.cheese = cheese;
+        this.lives = lives;
+    }
+    
     public bool Equals(PlayerInfo other)
     {
         return playerId == other.playerId;

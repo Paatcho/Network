@@ -5005,6 +5005,7 @@ MonoBehaviour:
   deathCooldownTime: 5
   spawnPosition: {x: 0, y: 0.25, z: 0}
   jumpStrength: 5
+  horizontalDampingFactor: 0.95
 --- !u!114 &6343297642010879143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5060,7 +5061,7 @@ Rigidbody:
   m_GameObject: {fileID: 7187974373630988430}
   serializedVersion: 5
   m_Mass: 1
-  m_LinearDamping: 5
+  m_LinearDamping: 0
   m_AngularDamping: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
