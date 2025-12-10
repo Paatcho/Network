@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -6,10 +7,16 @@ using Math = System.Math;
 
 public class PlayerController : MonoBehaviour
 {
+    public enum PlayerMode
+    {
+        Play,
+        Spectate
+    }
+    
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Collider coll;
-    [SerializeField] private float moveSpeed = 3.5f;
-    [SerializeField] private float runMoveSpeed = 5f;
+    [SerializeField] private float baseMoveSpeed = 8f;
+    [SerializeField] private float runMultiplier = 2f;
     [SerializeField] private float rotationSpeed = 5f;
     [SerializeField] private float staminaRechargeRate = 0.1f;
     [SerializeField] private float staminaDischargeRate = 0.2f;
@@ -17,15 +24,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float exhaustionEndThreshold = 0.5f;
     [SerializeField] private int deathCooldownTime = 5;
     [SerializeField] private Vector3 spawnPosition;
-    [SerializeField] private float jumpStrength = 100;
+    // [SerializeField] private float jumpStrength = 5;
     [SerializeField] private float horizontalDampingFactor = 5f;
 
     private CameraController _cam;
     private PlayerNetwork _network;
     private NetworkTransform _networkTransform;
     private float _stamina = 1f;
+    private float _currentMoveSpeed;
+    private int _spectateIndex = 0;
     
     public MouseHole CurrentHole { get; set; }
+    public PlayerMode CurrentMode { get; set; } = PlayerMode.Play;
 
     private float Stamina
     {
@@ -44,6 +54,7 @@ public class PlayerController : MonoBehaviour
         _cam = CameraController.instance;
         CameraController.instance.LookAt(transform);
         transform.position = spawnPosition;
+        _currentMoveSpeed = baseMoveSpeed;
         _network = playerNetwork;
         _networkTransform = networkTransform;
     }
@@ -51,7 +62,20 @@ public class PlayerController : MonoBehaviour
     public void Update()
     {
         if (!_cam || rb.isKinematic) return;
-        
+
+        switch (CurrentMode)
+        {
+            case PlayerMode.Play:
+                PlayUpdate();
+                break;
+            case PlayerMode.Spectate:
+                SpectateUpdate();
+                break;
+        }
+    }
+
+    private void PlayUpdate()
+    {
         // Movement.
         Vector3 moveInput = Vector3.zero;
         
@@ -87,7 +111,7 @@ public class PlayerController : MonoBehaviour
             moveInput.y = 0;
             moveInput = Vector3.ClampMagnitude(moveInput, 1);
 
-            float speed = isRunning ? runMoveSpeed : moveSpeed;
+            float speed = _currentMoveSpeed * (isRunning ? runMultiplier : 1f);
 
             Vector3 velocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             if (velocity.magnitude < speed * 0.9f)
@@ -111,14 +135,14 @@ public class PlayerController : MonoBehaviour
             
             #endregion
             
-            #region Vertical Movement
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                rb.AddForce(Vector3.up * jumpStrength, ForceMode.Impulse);
-            }
-            
-            #endregion
+            // #region Vertical Movement
+            //
+            // if (Input.GetKeyDown(KeyCode.Space))
+            // {
+            //     rb.AddForce(Vector3.up * jumpStrength, ForceMode.Impulse);
+            // }
+            //
+            // #endregion
             
             Vector3 v = rb.linearVelocity;
 
@@ -144,9 +168,46 @@ public class PlayerController : MonoBehaviour
         });
     }
 
-    public void Die()
+    private void SpectateUpdate()
     {
-        StartCoroutine(RespawnCoroutine());
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            ChangeSpectatePlayer(-1);
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            ChangeSpectatePlayer(1);
+        }
+    }
+
+    public void ChangeSpectatePlayer(int increase)
+    {
+        IReadOnlyList<NetworkClient> clients = NetworkManager.Singleton.ConnectedClientsList;
+        
+        _spectateIndex = (_spectateIndex + increase + clients.Count) % clients.Count;
+        
+        while (clients[_spectateIndex].PlayerObject.GetComponent<PlayerNetwork>().lost.Value)
+        {
+            _spectateIndex = (_spectateIndex + increase + clients.Count) % clients.Count;
+        }
+        
+        CameraController.instance.LookAt(clients[_spectateIndex].PlayerObject.transform);
+    }
+
+    public void Die(int lifeCount)
+    {
+        ResetSize();
+
+        if (lifeCount > 0)
+        {
+            StartCoroutine(RespawnCoroutine());
+        }
+        else
+        {
+            _cam.SetTitle("You lost.");
+            _cam.SetSubtitle("Spectating.");
+        }
     }
 
     private IEnumerator RespawnCoroutine()
@@ -158,6 +219,11 @@ public class PlayerController : MonoBehaviour
         {
             _cam.SetTitle("You died.");
             _cam.SetSubtitle("Respawning in: " + cooldown);
+            if (cooldown == 1)
+            {
+                EnableController(false);
+                Teleport(spawnPosition);
+            }
             yield return new WaitForSeconds(1f);
         }
 
@@ -166,7 +232,7 @@ public class PlayerController : MonoBehaviour
 
     public void Teleport(Vector3 position)
     {
-        _networkTransform.Teleport(position, Quaternion.identity, Vector3.one);
+        _networkTransform.Teleport(position, Quaternion.identity, transform.localScale);
     }
 
     private IEnumerator Respawn()
@@ -176,7 +242,7 @@ public class PlayerController : MonoBehaviour
         Teleport(spawnPosition);
         yield return null;
         EnableController(true);
-        _network.OnRespawnClientRpc();
+        _network.OnRespawnServerRpc();
     }
 
     public void EnableController(bool value)
@@ -187,6 +253,18 @@ public class PlayerController : MonoBehaviour
 
     public void PickUpCollectible(NetworkObjectReference collectible, Collectible.CollectibleType type)
     {
-        _network.PickUpCollectibleServerRpc(collectible, type);
+        _network.PickUpCollectible(collectible, type);
+        _currentMoveSpeed *= 0.85f;
+
+        if (type == Collectible.CollectibleType.Cheese)
+        {
+            transform.localScale += Vector3.one * 0.15f;
+        }
+    }
+
+    public void ResetSize()
+    {
+        transform.localScale = Vector3.one;
+        _currentMoveSpeed = baseMoveSpeed;
     }
 }

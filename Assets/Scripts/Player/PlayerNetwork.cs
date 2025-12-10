@@ -10,6 +10,8 @@ public class PlayerNetwork : NetworkBehaviour
         Crushed,
         Explosion
     }
+
+    public const int CheeseWinCount = 1;
     
     [SerializeField] private PlayerController controller;
     [SerializeField] private PlayerView view;
@@ -33,19 +35,32 @@ public class PlayerNetwork : NetworkBehaviour
         },
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
+    
+    public readonly NetworkVariable<bool> lost = new(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+    
+    public readonly NetworkVariable<bool> win = new(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+    
+    private int _cheeseCount = 0;
+    private int _lifeCount = 5;
 
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
             controller.Init(this, networkTransform);
-            view.Init(this);
         }
         else
         {
             controller.enabled = false;
         }
 
+        view.Init(this);
         exhausted.OnValueChanged += OnExhaustionChanged;
     }
 
@@ -59,8 +74,14 @@ public class PlayerNetwork : NetworkBehaviour
         view.SetExhausted(current);
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void OnRespawnServerRpc()
+    {
+        OnRespawnClientRpc();
+    }
+    
     [ClientRpc]
-    public void OnRespawnClientRpc()
+    private void OnRespawnClientRpc()
     {
         view.OnRespawn();
     }
@@ -69,37 +90,62 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner || dead.Value) return;
         
-        controller.Die();
-        UpdatePlayerLifeServerRpc((int)OwnerClientId);
-        DisplayDeathClientRpc(deathType);
+        _cheeseCount = 0;
+        _lifeCount--;
+        controller.Die(_lifeCount);
+
+        DisplayDeathServerRpc(deathType);
+        print("www");
+        UpdatePlayerLifeServerRpc();
         dead.Value = true;
+        
+        if (_lifeCount <= 0)
+        {
+            OnLost();
+        }
     }
 
-    [ServerRpc]
-    private void UpdatePlayerLifeServerRpc(int ownerClientId)
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdatePlayerLifeServerRpc()
     {
-        PlayerManager.Instance.LoseLife(ownerClientId);
+        PlayerManager.Instance.UpdateCardServerRpc((int)OwnerClientId, _lifeCount, _cheeseCount);
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    private void DisplayDeathServerRpc(DeathType deathType)
+    {
+        DisplayDeathClientRpc(deathType);
     }
     
     [ClientRpc]
     private void DisplayDeathClientRpc(DeathType deathType)
     {
+        print("sss");
         view.Die(deathType);
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void PickUpCollectibleServerRpc(NetworkObjectReference collectible, Collectible.CollectibleType type)
+    public void PickUpCollectible(NetworkObjectReference collectible, Collectible.CollectibleType type)
     {
         switch (type)
         {
             case Collectible.CollectibleType.Cheese:
-                PlayerManager.Instance.CollectCheese((int)OwnerClientId);
+                _cheeseCount++;
+                PickUpCheeseServerRpc(collectible);
+                if (_cheeseCount == CheeseWinCount)
+                {
+                    WinServerRpc();
+                }
                 break;
             case Collectible.CollectibleType.Crumb:
                 break;
         }
-        
-        //RequestCollectServerRpc(collectible);
+    }
+
+    [ServerRpc]
+    private void PickUpCheeseServerRpc(NetworkObjectReference collectible)
+    {
+        PlayerManager.Instance.UpdateCardServerRpc((int)OwnerClientId, _lifeCount, _cheeseCount);
+        RequestCollectServerRpc(collectible);
     }
     
     [ServerRpc(RequireOwnership = false)]
@@ -107,7 +153,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (collectible.TryGet(out NetworkObject obj))
         {
-            obj.Despawn(true);
+            obj.Despawn();
         }
         else
         {
@@ -120,6 +166,45 @@ public class PlayerNetwork : NetworkBehaviour
         newMovementData.direction =
             newMovementData.direction == Vector3.zero ? movementData.Value.direction : newMovementData.direction;
         movementData.Value = newMovementData;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void WinServerRpc()
+    {
+        WinClientRpc();
+    }
+    
+    [ClientRpc]
+    private void WinClientRpc()
+    {
+        if (IsOwner)
+        {
+            win.Value = true;
+            controller.ResetSize();
+        }
+        
+        view.LaunchWinAnimation();
+
+        if (!win.Value)
+        {
+            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>().OnLost();
+        }
+    }
+
+    private void OnLost()
+    {
+        // Dead :c
+        if (!lost.Value)
+        {
+            CameraController.instance.SetTitle("You lost.");
+            CameraController.instance.SetSubtitle("All the cheese has been eaten.");
+            
+            lost.Value = true;
+            controller.CurrentMode = PlayerController.PlayerMode.Spectate;
+            controller.ChangeSpectatePlayer(1);
+            
+            PlayerManager.Instance.PlayerLost();
+        }
     }
 }
 

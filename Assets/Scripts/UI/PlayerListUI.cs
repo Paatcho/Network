@@ -2,25 +2,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class PlayerListUI : NetworkBehaviour
+public class PlayerListUI : MonoBehaviour
 {
     [SerializeField] private PlayerCard playerCardPrefab;
 
     private readonly Dictionary<int, PlayerCard> _cards = new();
 
-    public override void OnNetworkSpawn()
+    public void OnNetworkSpawn()
     {
         PlayerManager.Instance.players.OnListChanged += OnPlayersChanged;
         
         RebuildUI();
     }
 
-    public override void OnNetworkDespawn()
+    public void OnNetworkDespawn()
     {
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.players.OnListChanged -= OnPlayersChanged;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            RebuildUI();
+        }
+    }
+    
     private void RebuildUI()
     {
         foreach (Transform child in transform)
@@ -30,7 +38,6 @@ public class PlayerListUI : NetworkBehaviour
         
         foreach (var p in PlayerManager.Instance.players)
         {
-            print(p.name);
             CreateCard(p);
         }
     }
@@ -60,7 +67,7 @@ public class PlayerListUI : NetworkBehaviour
         _cards[info.playerId] = card;
     }
 
-    private void UpdateCard(PlayerInfo info)
+    public void UpdateCard(PlayerInfo info)
     {
         if (_cards.TryGetValue(info.playerId, out var card))
         {

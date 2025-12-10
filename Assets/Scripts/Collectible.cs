@@ -22,7 +22,7 @@ public class Collectible : MonoBehaviour
             if (player && player.enabled)
             {
                 player.PickUpCollectible(network, _type);
-                Destroy(gameObject); // Destroy object on the client side.
+                // Destroy(gameObject); // Destroy object on the client side.
             }
         }
     }

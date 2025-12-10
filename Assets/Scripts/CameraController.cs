@@ -23,13 +23,14 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Color staminaBaseColor;
     [SerializeField] private Color staminaCooldownColor;
     [SerializeField] private float textFadeTime = 2f;
-    [SerializeField] private PlayerListUI playerListUI;
 
     private Transform _target;
     private Tween _titleTween;
     private Tween _subtitleTween;
     private float _rotationX;
     private float _rotationY;
+    
+    public PlayerListUI playerListUI;
 
     private void Awake()
     {

@@ -1,11 +1,16 @@
+using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEngine;
 
 public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance { get; private set; }
 
-    public readonly NetworkList<PlayerInfo> players = new();
+    public readonly NetworkList<PlayerInfo> players = new(
+        new List<PlayerInfo>(),
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+
+    private readonly NetworkVariable<int> playersLeft = new();
 
     private void Awake()
     {
@@ -18,12 +23,29 @@ public class PlayerManager : NetworkBehaviour
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         }
+
+        if (IsClient)
+        {
+            AddPlayerServerRpc();
+        }
+        
+        CameraController.instance.playerListUI.OnNetworkSpawn();
     }
 
     public override void OnNetworkDespawn()
     {
         if (IsServer)
+        {
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        }
+        
+        CameraController.instance.playerListUI.OnNetworkDespawn();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void AddPlayerServerRpc()
+    {
+        playersLeft.Value++;
     }
 
     private void OnClientConnected(ulong clientId)
@@ -38,23 +60,25 @@ public class PlayerManager : NetworkBehaviour
         ));
     }
 
-    public void CollectCheese(int playerId)
+    public void PlayerLost()
     {
-        if (!IsServer) return;
-
-        for (int i = 0; i < players.Count; i++)
+        playersLeft.Value--;
+        
+        if (playersLeft.Value == 1)
         {
-            if (players[i].playerId == playerId)
+            foreach (NetworkClient networkClient in NetworkManager.ConnectedClientsList)
             {
-                var p = players[i];
-                p.cheese++;
-                players[i] = p;
-                break;
+                var playerNetwork = networkClient.PlayerObject.GetComponent<PlayerNetwork>();
+                if (!playerNetwork.lost.Value)
+                {
+                    playerNetwork.WinServerRpc();
+                }
             }
         }
     }
 
-    public void LoseLife(int playerId)
+    [ServerRpc]
+    public void UpdateCardServerRpc(int playerId, int lifeCount, int cheeseCount)
     {
         if (!IsServer) return;
 
@@ -63,10 +87,18 @@ public class PlayerManager : NetworkBehaviour
             if (players[i].playerId == playerId)
             {
                 var p = players[i];
-                p.lives--;
+                p.cheese = cheeseCount;
+                p.lives = lifeCount;
                 players[i] = p;
-                break;
+                UpdatePlayerCardClientRpc(p);
+                return;
             }
         }
+    }
+
+    [ClientRpc]
+    private void UpdatePlayerCardClientRpc(PlayerInfo p)
+    {
+        CameraController.instance.playerListUI.UpdateCard(p);
     }
 }
