@@ -1,5 +1,6 @@
-using System;
 using System.Collections;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using Math = System.Math;
 
@@ -20,10 +21,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float horizontalDampingFactor = 5f;
 
     private CameraController _cam;
-    private bool _exhausted;
     private PlayerNetwork _network;
+    private NetworkTransform _networkTransform;
     private float _stamina = 1f;
-    private bool _deathCooldown;
     
     public MouseHole CurrentHole { get; set; }
 
@@ -33,29 +33,31 @@ public class PlayerController : MonoBehaviour
         set
         {
             _stamina = value;
-            _cam.UpdateStaminaDisplay(value, _exhausted);
+            _cam.UpdateStaminaDisplay(value, _network.exhausted.Value);
         }
     }
 
     private static bool Run => Input.GetKey(KeyCode.LeftShift);
 
-    public void Init(PlayerNetwork playerNetwork)
+    public void Init(PlayerNetwork playerNetwork, NetworkTransform networkTransform)
     {
         _cam = CameraController.instance;
         CameraController.instance.LookAt(transform);
         transform.position = spawnPosition;
         _network = playerNetwork;
+        _networkTransform = networkTransform;
     }
 
-    public void Move()
+    public void Update()
     {
         if (!_cam || rb.isKinematic) return;
-
+        
+        // Movement.
         Vector3 moveInput = Vector3.zero;
         
-        if (_deathCooldown)
+        if (_network.dead.Value)
         {
-            _exhausted = false;
+            _network.exhausted.Value = false;
         }
         else
         {
@@ -67,14 +69,14 @@ public class PlayerController : MonoBehaviour
             {
                 if (Stamina >= exhaustionEndThreshold)
                 {
-                    _exhausted = false;
+                    _network.exhausted.Value = false;
                 }
 
-                isRunning = Run && !_exhausted;
+                isRunning = Run && !_network.exhausted.Value;
             }
             else
             {
-                _exhausted = true;
+                _network.exhausted.Value = true;
                 isRunning = false;
             }
             
@@ -122,18 +124,23 @@ public class PlayerController : MonoBehaviour
 
             float y = v.y;
 
+            // Damp horizontal movement.
             Vector3 horizontal = new Vector3(v.x, 0, v.z);
             horizontal *= horizontalDampingFactor;
 
             rb.linearVelocity = horizontal + Vector3.up * y;
         }
-
-        _network.UpdatePlayerData(new PlayerData
+        
+        // Enter mouse hole.
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            Exhausted = _exhausted,
-            Direction = moveInput,
-            Velocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude,
-            Dead = _deathCooldown
+            CurrentHole.Enter(this);
+        }
+
+        _network.UpdateMovementData(new PlayerMovementData
+        {
+            direction = moveInput,
+            velocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude
         });
     }
 
@@ -144,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator RespawnCoroutine()
     {
-        _deathCooldown = true;
+        _network.dead.Value = true;
         EnableController(false);
         
         for (int cooldown = deathCooldownTime; cooldown > 0; cooldown -= 1)
@@ -159,17 +166,17 @@ public class PlayerController : MonoBehaviour
 
     public void Teleport(Vector3 position)
     {
-        _network.TeleportRpc(position);
+        _networkTransform.Teleport(position, Quaternion.identity, Vector3.one);
     }
 
     private IEnumerator Respawn()
     {
-        _deathCooldown = false;
+        _network.dead.Value = false;
         EnableController(false);
         Teleport(spawnPosition);
         yield return null;
         EnableController(true);
-        _network.OnRespawnRpc();
+        _network.OnRespawnClientRpc();
     }
 
     public void EnableController(bool value)
@@ -178,9 +185,8 @@ public class PlayerController : MonoBehaviour
         coll.enabled = value;
     }
 
-    public void PickUpCollectible(Collectible.CollectibleType collectibleType)
+    public void PickUpCollectible(NetworkObjectReference collectible, Collectible.CollectibleType type)
     {
-        print(_network);
-        _network.PickUpCollectibleRpc(collectibleType);
+        _network.PickUpCollectibleServerRpc(collectible, type);
     }
 }

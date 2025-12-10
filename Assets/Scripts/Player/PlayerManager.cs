@@ -5,7 +5,7 @@ public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance { get; private set; }
 
-    public NetworkList<PlayerInfo> Players = new();
+    public readonly NetworkList<PlayerInfo> players = new();
 
     private void Awake()
     {
@@ -30,7 +30,7 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        Players.Add(new PlayerInfo(
+        players.Add(new PlayerInfo(
             (int)clientId,
             $"Player {clientId}",
             cheese: 0,
@@ -42,13 +42,13 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        for (int i = 0; i < Players.Count; i++)
+        for (int i = 0; i < players.Count; i++)
         {
-            if (Players[i].playerId == playerId)
+            if (players[i].playerId == playerId)
             {
-                var p = Players[i];
+                var p = players[i];
                 p.cheese++;
-                Players[i] = p;
+                players[i] = p;
                 break;
             }
         }
@@ -58,13 +58,13 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        for (int i = 0; i < Players.Count; i++)
+        for (int i = 0; i < players.Count; i++)
         {
-            if (Players[i].playerId == playerId)
+            if (players[i].playerId == playerId)
             {
-                var p = Players[i];
+                var p = players[i];
                 p.lives--;
-                Players[i] = p;
+                players[i] = p;
                 break;
             }
         }

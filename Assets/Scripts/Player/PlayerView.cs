@@ -1,6 +1,3 @@
-using System;
-using System.Numerics;
-using DG.Tweening;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -24,24 +21,29 @@ public class PlayerView : MonoBehaviour
     [SerializeField] private Sprite[] sprites;
     [SerializeField] private Vector3 walkAnimationPosition = new(0, 0.05f);
     
+    private PlayerNetwork _network;
     private Camera _camera;
     private bool _animUp;
     private float _animTimer;
 
-    private void Start()
+    public void Init(PlayerNetwork network)
     {
         _camera = Camera.main;
         transform.localPosition = Vector3.zero;
+        _network = network;
     }
 
     private void Update()
     {
         bool yInverted = Vector3.Angle(transform.forward, Vector3.forward) <= 90;
         
+        UpdateDirection(_network.movementData.Value.direction);
+        UpdateView(_network.movementData.Value.velocity);
+        
         spriteRenderer.material.SetTexture(BumpMap, yInverted ? invertedNormalMap : normalMap);
     }
 
-    public void UpdateView(float velocity)
+    private void UpdateView(float velocity)
     {
         _animTimer += velocity * Time.deltaTime;
         
@@ -59,7 +61,7 @@ public class PlayerView : MonoBehaviour
         }
     }
 
-    public void UpdateDirection(Vector3 direction)
+    private void UpdateDirection(Vector3 direction)
     {
         if (direction == Vector3.zero) return;
         

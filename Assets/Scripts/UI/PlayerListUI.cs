@@ -6,21 +6,19 @@ public class PlayerListUI : NetworkBehaviour
 {
     [SerializeField] private PlayerCard playerCardPrefab;
 
-    private readonly Dictionary<int, PlayerCard> cards = new();
+    private readonly Dictionary<int, PlayerCard> _cards = new();
 
     public override void OnNetworkSpawn()
     {
-        PlayerManager.Instance.Players.OnListChanged += OnPlayersChanged;
+        PlayerManager.Instance.players.OnListChanged += OnPlayersChanged;
         
-        print("list");
-
         RebuildUI();
     }
 
     public override void OnNetworkDespawn()
     {
         if (PlayerManager.Instance != null)
-            PlayerManager.Instance.Players.OnListChanged -= OnPlayersChanged;
+            PlayerManager.Instance.players.OnListChanged -= OnPlayersChanged;
     }
 
     private void RebuildUI()
@@ -28,11 +26,9 @@ public class PlayerListUI : NetworkBehaviour
         foreach (Transform child in transform)
             Destroy(child.gameObject);
 
-        cards.Clear();
+        _cards.Clear();
         
-        print("Rebuilding UI");
-
-        foreach (var p in PlayerManager.Instance.Players)
+        foreach (var p in PlayerManager.Instance.players)
         {
             print(p.name);
             CreateCard(p);
@@ -61,12 +57,12 @@ public class PlayerListUI : NetworkBehaviour
     {
         var card = Instantiate(playerCardPrefab, transform);
         card.Init(info.name.ToString(), info.cheese, info.lives);
-        cards[info.playerId] = card;
+        _cards[info.playerId] = card;
     }
 
     private void UpdateCard(PlayerInfo info)
     {
-        if (cards.TryGetValue(info.playerId, out var card))
+        if (_cards.TryGetValue(info.playerId, out var card))
         {
             card.UpdatePlayerCheeses(info.cheese);
             card.UpdatePlayerLives(info.lives);
@@ -75,10 +71,10 @@ public class PlayerListUI : NetworkBehaviour
 
     private void RemoveCard(int playerId)
     {
-        if (cards.TryGetValue(playerId, out var card))
+        if (_cards.TryGetValue(playerId, out var card))
         {
             Destroy(card.gameObject);
-            cards.Remove(playerId);
+            _cards.Remove(playerId);
         }
     }
 }

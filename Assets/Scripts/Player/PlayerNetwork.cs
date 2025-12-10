@@ -15,14 +15,21 @@ public class PlayerNetwork : NetworkBehaviour
     [SerializeField] private PlayerView view;
     [SerializeField] private NetworkTransform networkTransform;
 
-    private readonly NetworkVariable<PlayerData> _playerData = new(
-        new PlayerData
+    public readonly NetworkVariable<bool> exhausted = new(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+
+    public readonly NetworkVariable<bool> dead = new(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+
+    public readonly NetworkVariable<PlayerMovementData> movementData = new(
+        new PlayerMovementData
         {
-            Exhausted = false,
-            Direction = Vector3.forward,
-            Velocity = 0f,
-            Dead = false,
-            
+            direction = Vector3.forward,
+            velocity = 0f,
         },
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
@@ -31,67 +38,59 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (IsOwner)
         {
-            print("burrrrr");
-            controller.Init(this);
+            controller.Init(this, networkTransform);
+            view.Init(this);
+        }
+        else
+        {
+            controller.enabled = false;
         }
 
-        _playerData.OnValueChanged += (_, newValue) => { view.SetExhausted(newValue.Exhausted); };
+        exhausted.OnValueChanged += OnExhaustionChanged;
     }
 
-    private void Update()
+    public override void OnNetworkDespawn()
     {
-        view.UpdateDirection(_playerData.Value.Direction);
-        view.UpdateView(_playerData.Value.Velocity);
-
-        if (IsOwner)
-        {
-            controller.Move();
-
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                EnterHole();
-            }
-        } 
+        exhausted.OnValueChanged -= OnExhaustionChanged;
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void OnRespawnRpc()
+    private void OnExhaustionChanged(bool previous, bool current)
+    {
+        view.SetExhausted(current);
+    }
+
+    [ClientRpc]
+    public void OnRespawnClientRpc()
     {
         view.OnRespawn();
     }
     
     public void Die(DeathType deathType = DeathType.Default)
     {
-        if (!IsOwner) return;
+        if (!IsOwner || dead.Value) return;
         
-        DieServerRpc(deathType);
+        controller.Die();
+        UpdatePlayerLifeServerRpc((int)OwnerClientId);
+        DisplayDeathClientRpc(deathType);
+        dead.Value = true;
     }
 
     [ServerRpc]
-    private void DieServerRpc(DeathType deathType)
+    private void UpdatePlayerLifeServerRpc(int ownerClientId)
     {
-        if (_playerData.Value.Dead) return;
-
-        PlayerManager.Instance.LoseLife((int)OwnerClientId);
-
-        DieClientRpc(deathType);
-
-        _playerData.Value = new PlayerData { Dead = true };
+        PlayerManager.Instance.LoseLife(ownerClientId);
     }
     
     [ClientRpc]
-    private void DieClientRpc(DeathType deathType)
+    private void DisplayDeathClientRpc(DeathType deathType)
     {
         view.Die(deathType);
-
-        if (IsOwner)
-            controller.Die();
     }
 
-    [Rpc(SendTo.Everyone)]
-    public void PickUpCollectibleRpc(Collectible.CollectibleType collectibleType)
+    [ServerRpc(RequireOwnership = false)]
+    public void PickUpCollectibleServerRpc(NetworkObjectReference collectible, Collectible.CollectibleType type)
     {
-        switch (collectibleType)
+        switch (type)
         {
             case Collectible.CollectibleType.Cheese:
                 PlayerManager.Instance.CollectCheese((int)OwnerClientId);
@@ -99,41 +98,39 @@ public class PlayerNetwork : NetworkBehaviour
             case Collectible.CollectibleType.Crumb:
                 break;
         }
-    }
-
-    public void UpdatePlayerData(PlayerData playerData)
-    {
-        playerData.Direction =
-            playerData.Direction == Vector3.zero ? _playerData.Value.Direction : playerData.Direction;
-        _playerData.Value = playerData;
-    }
-
-    [Rpc(SendTo.Me)]
-    public void TeleportRpc(Vector3 position)
-    {
-        networkTransform.Teleport(position, Quaternion.identity, Vector3.one);
-    }
-
-    private void EnterHole()
-    {
-        if (!controller.CurrentHole) return;
         
-        controller.CurrentHole.Enter(controller);
+        //RequestCollectServerRpc(collectible);
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestCollectServerRpc(NetworkObjectReference collectible)
+    {
+        if (collectible.TryGet(out NetworkObject obj))
+        {
+            obj.Despawn(true);
+        }
+        else
+        {
+            Debug.LogWarning("Collectible could not be found on server!");
+        }
+    }
+
+    public void UpdateMovementData(PlayerMovementData newMovementData)
+    {
+        newMovementData.direction =
+            newMovementData.direction == Vector3.zero ? movementData.Value.direction : newMovementData.direction;
+        movementData.Value = newMovementData;
     }
 }
 
-public struct PlayerData : INetworkSerializable
+public struct PlayerMovementData : INetworkSerializable
 {
-    public bool Exhausted;
-    public Vector3 Direction;
-    public float Velocity;
-    public bool Dead;
-
+    public Vector3 direction;
+    public float velocity;
+    
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref Exhausted);
-        serializer.SerializeValue(ref Direction);
-        serializer.SerializeValue(ref Velocity);
-        serializer.SerializeValue(ref Dead);
+        serializer.SerializeValue(ref direction);
+        serializer.SerializeValue(ref velocity);
     }
 }
