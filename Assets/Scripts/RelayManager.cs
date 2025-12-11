@@ -23,6 +23,15 @@ public class RelayManager : MonoBehaviour
 	{
 		_ = CreateRelay();
 	}
+	
+	public void Disconnect()
+	{
+		if (NetworkManager.Singleton != null)
+		{
+			NetworkManager.Singleton.Shutdown();
+		}
+	}
+
 
 	public async Task<string> CreateRelay()
 	{

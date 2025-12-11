@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7932217731706044604}
   - component: {fileID: 2518327204746439288}
   - component: {fileID: -2400449746246543963}
+  - component: {fileID: 5547565275335569480}
   m_Layer: 7
   m_Name: Cheese
   m_TagString: Untagged
@@ -140,6 +141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   network: {fileID: -2400449746246543963}
+  spawnedElement: {fileID: 5547565275335569480}
 --- !u!114 &-2400449746246543963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,3 +167,16 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &5547565275335569480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3083058938811797151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 897ecf485884366f5862d58f392e1ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnedElement
+  ShowTopMostFoldoutHeaderGroup: 1

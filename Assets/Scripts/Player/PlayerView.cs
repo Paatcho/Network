@@ -30,15 +30,14 @@ public class PlayerView : MonoBehaviour
     private Camera _camera;
     private bool _animUp;
     private float _animTimer;
-    private PlayerAnimation _winAnim;
 
+    public int AnimCount => winAnimations.Count;
+    
     public void Init(PlayerNetwork network)
     {
         _camera = Camera.main;
         transform.localPosition = Vector3.zero;
         _network = network;
-        
-        _winAnim = winAnimations[Random.Range(0, winAnimations.Count)];
     }
 
     private void Update()
@@ -57,7 +56,7 @@ public class PlayerView : MonoBehaviour
     {
         spriteRenderer.enabled = false;
         winSpriteRenderer.enabled = true;
-        winSpriteRenderer.transform.localPosition += Vector3.up * _winAnim.height;
+        winSpriteRenderer.transform.localPosition += Vector3.up * winAnimations[_network.winAnimIndex.Value].height;
         StartCoroutine(WinAnimation());
     }
     
@@ -65,10 +64,10 @@ public class PlayerView : MonoBehaviour
     {
         while (true)
         {
-            foreach (Sprite sprite in _winAnim.sprites)
+            foreach (Sprite sprite in winAnimations[_network.winAnimIndex.Value].sprites)
             {
                 winSpriteRenderer.sprite = sprite;
-                yield return new WaitForSeconds(_winAnim.spriteTime);
+                yield return new WaitForSeconds(winAnimations[_network.winAnimIndex.Value].spriteTime);
             }
         }
     }

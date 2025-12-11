@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfa17622ae113d345823d4083365159c, type: 3}
-  m_Name: Rat Dance
+  m_Name: Rat Dance 1
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
   sprites:
   - {fileID: -901244285, guid: 231828a50664ca346ae3cca447ff43e7, type: 3}
@@ -171,4 +171,4 @@ MonoBehaviour:
   - {fileID: -2035690539, guid: 231828a50664ca346ae3cca447ff43e7, type: 3}
   - {fileID: 1381939558, guid: 231828a50664ca346ae3cca447ff43e7, type: 3}
   spriteTime: 0.03
-  height: 0.7
+  height: 0.6

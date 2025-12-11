@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour
         // Enter mouse hole.
         if (Input.GetKeyDown(KeyCode.E))
         {
-            CurrentHole.Enter(this);
+            CurrentHole?.Enter(this);
         }
 
         _network.UpdateMovementData(new PlayerMovementData
@@ -197,7 +197,7 @@ public class PlayerController : MonoBehaviour
 
     public void Die(int lifeCount)
     {
-        ResetSize();
+        ResetOnDeath();
 
         if (lifeCount > 0)
         {
@@ -254,17 +254,27 @@ public class PlayerController : MonoBehaviour
     public void PickUpCollectible(NetworkObjectReference collectible, Collectible.CollectibleType type)
     {
         _network.PickUpCollectible(collectible, type);
-        _currentMoveSpeed *= 0.85f;
 
         if (type == Collectible.CollectibleType.Cheese)
         {
+            ResetStamina();
+            _currentMoveSpeed *= 0.9f;
             transform.localScale += Vector3.one * 0.15f;
         }
     }
 
-    public void ResetSize()
+    public void ResetOnDeath()
     {
+        ResetStamina();
+        
+        // Reset mouse size.
         transform.localScale = Vector3.one;
         _currentMoveSpeed = baseMoveSpeed;
+    }
+
+    private void ResetStamina()
+    {
+        _network.exhausted.Value = false;
+        Stamina = 1f;
     }
 }

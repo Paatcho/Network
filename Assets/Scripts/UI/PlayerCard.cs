@@ -16,7 +16,7 @@ public class PlayerCard : MonoBehaviour
 
     public void UpdatePlayerCheeses(int newValue)
     {
-        playerCheeses.text = newValue.ToString();
+        playerCheeses.text = newValue + "/10";
     }
 
     public void UpdatePlayerLives(int newValue)

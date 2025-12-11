@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfa17622ae113d345823d4083365159c, type: 3}
+  m_Name: Rat Dance 3
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
+  sprites:
+  - {fileID: 82667294, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1277627444, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 551573852, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1357876169, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 676376359, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1178042354, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1775720303, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 581540210, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -666367802, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 1787760841, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1144031774, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -562452687, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 1813802553, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 1204517591, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 663120049, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 408376569, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -726219229, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1462212410, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1048459380, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 1149283223, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 984168212, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: 854268833, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -1101894924, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  - {fileID: -379025214, guid: 07abb11f13fbe8cddb7abdb9b46e0cef, type: 3}
+  spriteTime: 0.03
+  height: 0.2

@@ -12,6 +12,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private TMP_Text title;
     [SerializeField] private TMP_Text subtitle;
     [SerializeField] private Transform playerList;
+    [SerializeField] private GameObject lobbyUI;
 
     [SerializeField] private float rotationSpeed = 2f;
     [SerializeField] private float height = 0.8f;
@@ -78,28 +79,38 @@ public class CameraController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
+    public void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public void SetLobbyUI(bool value)
+    {
+        lobbyUI.SetActive(value);
+    }
+
     public void UpdateStaminaDisplay(float value, bool cooldown)
     {
         staminaDisplay.value = value;
         staminaDisplayFill.color = cooldown ? staminaCooldownColor : staminaBaseColor;
     }
 
-    private void SetField(TMP_Text field, string text)
+    private void SetField(TMP_Text field, string text, bool longTitle)
     {
         field.text = text;
         field.alpha = 1f;
-        field.DOFade(0f, textFadeTime).SetEase(Ease.InExpo);
+        field.DOFade(0f, textFadeTime * (longTitle ? 3 : 1)).SetEase(Ease.InExpo);
     }
 
-    public void SetTitle(string text)
+    public void SetTitle(string text, bool longTitle = false)
     {
         _titleTween.Kill();
-        SetField(title, text);
+        SetField(title, text, longTitle);
     }
 
-    public void SetSubtitle(string text)
+    public void SetSubtitle(string text, bool longTitle = false)
     {
         _subtitleTween.Kill();
-        SetField(subtitle, text);
+        SetField(subtitle, text, longTitle);
     }
 }

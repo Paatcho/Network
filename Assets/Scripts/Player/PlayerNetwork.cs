@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -10,12 +11,19 @@ public class PlayerNetwork : NetworkBehaviour
         Crushed,
         Explosion
     }
+    
+    public enum WinType
+    {
+        Cheese,
+        Death
+    }
 
-    public const int CheeseWinCount = 1;
+    public const int CheeseWinCount = 10;
     
     [SerializeField] private PlayerController controller;
     [SerializeField] private PlayerView view;
     [SerializeField] private NetworkTransform networkTransform;
+    [SerializeField] private NetworkObject cheesePrefab;
 
     public readonly NetworkVariable<bool> exhausted = new(
         false,
@@ -46,6 +54,11 @@ public class PlayerNetwork : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
     
+    public readonly NetworkVariable<int> winAnimIndex = new(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+    
     private int _cheeseCount = 0;
     private int _lifeCount = 5;
 
@@ -54,6 +67,8 @@ public class PlayerNetwork : NetworkBehaviour
         if (IsOwner)
         {
             controller.Init(this, networkTransform);
+            CameraController.instance.SetLobbyUI(false);
+            winAnimIndex.Value = Random.Range(0, view.AnimCount);
         }
         else
         {
@@ -89,14 +104,18 @@ public class PlayerNetwork : NetworkBehaviour
     public void Die(DeathType deathType = DeathType.Default)
     {
         if (!IsOwner || dead.Value) return;
+
+        if (deathType != DeathType.Explosion)
+        {
+            SpawnCheeseOnDeathServerRpc(_cheeseCount / 2);
+        }
         
         _cheeseCount = 0;
         _lifeCount--;
         controller.Die(_lifeCount);
 
         DisplayDeathServerRpc(deathType);
-        print("www");
-        UpdatePlayerLifeServerRpc();
+        UpdatePlayerLifeServerRpc(_lifeCount, _cheeseCount);
         dead.Value = true;
         
         if (_lifeCount <= 0)
@@ -106,9 +125,9 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void UpdatePlayerLifeServerRpc()
+    private void UpdatePlayerLifeServerRpc(int lifeCount, int cheeseCount)
     {
-        PlayerManager.Instance.UpdateCardServerRpc((int)OwnerClientId, _lifeCount, _cheeseCount);
+        PlayerManager.Instance.UpdateCardServerRpc((int)OwnerClientId, lifeCount, cheeseCount);
     }
     
     [ServerRpc(RequireOwnership = false)]
@@ -116,11 +135,48 @@ public class PlayerNetwork : NetworkBehaviour
     {
         DisplayDeathClientRpc(deathType);
     }
+
+    private void CheckForWinner()
+    {
+        int aliveCount = 0;
+        
+        foreach (NetworkClient client in NetworkManager.ConnectedClients.Values)
+        {
+            if (!client.PlayerObject.GetComponent<PlayerNetwork>().lost.Value)
+            {
+                aliveCount++;
+            }
+        }
+        
+        if (aliveCount <= 1)
+        {
+            CallForWinServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void CallForWinServerRpc()
+    {
+        foreach (NetworkClient client in NetworkManager.ConnectedClients.Values)
+        {
+            client.PlayerObject.GetComponent<PlayerNetwork>().CallForWinClientRpc();
+        }
+    }
+
+    [ClientRpc]
+    private void CallForWinClientRpc()
+    {
+        if (!IsOwner) return;
+
+        if (!lost.Value && !win.Value)
+        {
+            WinServerRpc(WinType.Death);
+        }
+    }
     
     [ClientRpc]
     private void DisplayDeathClientRpc(DeathType deathType)
     {
-        print("sss");
         view.Die(deathType);
     }
 
@@ -130,10 +186,10 @@ public class PlayerNetwork : NetworkBehaviour
         {
             case Collectible.CollectibleType.Cheese:
                 _cheeseCount++;
-                PickUpCheeseServerRpc(collectible);
+                PickUpCheeseServerRpc(collectible, _lifeCount, _cheeseCount);
                 if (_cheeseCount == CheeseWinCount)
                 {
-                    WinServerRpc();
+                    WinServerRpc(WinType.Cheese);
                 }
                 break;
             case Collectible.CollectibleType.Crumb:
@@ -142,9 +198,9 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void PickUpCheeseServerRpc(NetworkObjectReference collectible)
+    private void PickUpCheeseServerRpc(NetworkObjectReference collectible, int lifeCount, int cheeseCount)
     {
-        PlayerManager.Instance.UpdateCardServerRpc((int)OwnerClientId, _lifeCount, _cheeseCount);
+        PlayerManager.Instance.UpdateCardServerRpc((int)OwnerClientId, lifeCount, cheeseCount);
         RequestCollectServerRpc(collectible);
     }
     
@@ -169,41 +225,62 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void WinServerRpc()
+    private void WinServerRpc(WinType winType)
     {
-        WinClientRpc();
+        WinClientRpc(winType);
     }
     
-    [ClientRpc]
-    private void WinClientRpc()
+    [ClientRpc(RequireOwnership = false)]
+    private void WinClientRpc(WinType winType)
     {
         if (IsOwner)
         {
+            CameraController.instance.SetTitle("You win!", true);
+            string subtitle = winType == WinType.Cheese ? "Plein de coulommiers." : "Tu as gagné la bagarre.";
+            CameraController.instance.SetSubtitle(subtitle, true);
             win.Value = true;
-            controller.ResetSize();
+            controller.ResetOnDeath();
         }
         
         view.LaunchWinAnimation();
+        LobbyManager.Instance.EnableQuitButton();
+        CameraController.instance.UnlockCursor();
 
         if (!win.Value)
         {
             NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>().OnLost();
         }
     }
-
+    
     private void OnLost()
     {
         // Dead :c
         if (!lost.Value)
         {
-            CameraController.instance.SetTitle("You lost.");
-            CameraController.instance.SetSubtitle("All the cheese has been eaten.");
+            CameraController.instance.SetTitle("You lost.", true);
+            CameraController.instance.SetSubtitle("All the cheese has been eaten.", true);
             
             lost.Value = true;
             controller.CurrentMode = PlayerController.PlayerMode.Spectate;
             controller.ChangeSpectatePlayer(1);
             
+            CheckForWinner();
+            
             PlayerManager.Instance.PlayerLost();
+        }
+    }
+
+    [ServerRpc]
+    private void SpawnCheeseOnDeathServerRpc(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            Vector3 spawnPosition = transform.position +
+                                    Random.Range(-2f, 2f) * Vector3.right +
+                                    Random.Range(-2f, 2f) * Vector3.forward;
+            
+            NetworkObject obj = Instantiate(cheesePrefab, spawnPosition, Quaternion.identity);
+            obj.Spawn();
         }
     }
 }

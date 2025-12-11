@@ -37,7 +37,7 @@ public class CrushedMouse : MonoBehaviour
     {
         Sequence seq = DOTween.Sequence();
 
-        Vector3 squishScale = new Vector3(1.7f, 1.7f, 1f);
+        Vector3 squishScale = new Vector3(1.7f, 1f, 1.7f);
 
         seq.Append(
             transform.DOScale(squishScale, squishDuration).SetEase(Ease.OutQuad)

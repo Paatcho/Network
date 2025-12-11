@@ -10,14 +10,6 @@ public class Hammer : NetworkBehaviour
     
     private bool _isHit = false;
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            HitServerRpc();
-        }
-    }
-
     [Rpc(SendTo.Everyone)]
     public void HitServerRpc()
     {

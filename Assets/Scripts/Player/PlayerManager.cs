@@ -10,7 +10,7 @@ public class PlayerManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
-    private readonly NetworkVariable<int> playersLeft = new();
+    public readonly NetworkVariable<int> playersLeft = new();
 
     private void Awake()
     {
@@ -47,6 +47,12 @@ public class PlayerManager : NetworkBehaviour
     {
         playersLeft.Value++;
     }
+    
+    [ServerRpc(RequireOwnership = false)]
+    private void DecreasePlayerServerRpc()
+    {
+        playersLeft.Value--;
+    }
 
     private void OnClientConnected(ulong clientId)
     {
@@ -62,22 +68,10 @@ public class PlayerManager : NetworkBehaviour
 
     public void PlayerLost()
     {
-        playersLeft.Value--;
-        
-        if (playersLeft.Value == 1)
-        {
-            foreach (NetworkClient networkClient in NetworkManager.ConnectedClientsList)
-            {
-                var playerNetwork = networkClient.PlayerObject.GetComponent<PlayerNetwork>();
-                if (!playerNetwork.lost.Value)
-                {
-                    playerNetwork.WinServerRpc();
-                }
-            }
-        }
+        DecreasePlayerServerRpc();
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void UpdateCardServerRpc(int playerId, int lifeCount, int cheeseCount)
     {
         if (!IsServer) return;

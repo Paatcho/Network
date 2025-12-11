@@ -4901,6 +4901,8 @@ MonoBehaviour:
   walkAnimationPosition: {x: 0, y: 0.05, z: 0}
   winAnimations:
   - {fileID: 11400000, guid: 9921aa87a8e172a40b25bb5b535ce553, type: 2}
+  - {fileID: 11400000, guid: bce124f2a9740d1c986a2e4285666518, type: 2}
+  - {fileID: 11400000, guid: f05db70bf9a8e3e2c9a309626dbd19c5, type: 2}
   winSpriteRenderer: {fileID: 712846340212788074}
 --- !u!1 &5126124241935246117
 GameObject:
@@ -5045,7 +5047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1975128928
+  GlobalObjectIdHash: 72300748
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5074,6 +5076,7 @@ MonoBehaviour:
   controller: {fileID: 2789501886289759898}
   view: {fileID: 6516563303314428307}
   networkTransform: {fileID: 6343297642010879143}
+  cheesePrefab: {fileID: -2400449746246543963, guid: b66a26e90defb631499cc549cd665682, type: 3}
 --- !u!114 &2789501886289759898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5097,7 +5100,6 @@ MonoBehaviour:
   exhaustionEndThreshold: 0.5
   deathCooldownTime: 5
   spawnPosition: {x: 0, y: 0.25, z: 0}
-  jumpStrength: 5
   horizontalDampingFactor: 0.95
 --- !u!114 &6343297642010879143
 MonoBehaviour:
