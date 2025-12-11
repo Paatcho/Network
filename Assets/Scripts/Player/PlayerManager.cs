@@ -62,7 +62,7 @@ public class PlayerManager : NetworkBehaviour
             (int)clientId,
             $"Player {clientId}",
             cheese: 0,
-            lives: 5
+            lives: 3
         ));
     }
 

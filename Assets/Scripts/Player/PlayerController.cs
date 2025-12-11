@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     private float _stamina = 1f;
     private float _currentMoveSpeed;
     private int _spectateIndex = 0;
+    public Hammer hammer;
     
     public MouseHole CurrentHole { get; set; }
     public PlayerMode CurrentMode { get; set; } = PlayerMode.Play;
@@ -85,8 +86,6 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            #region Horizontal Movement
-            
             bool isRunning;
 
             if (Stamina >= exhaustionThreshold)
@@ -133,17 +132,6 @@ public class PlayerController : MonoBehaviour
                 ? Math.Max(Stamina - staminaDischargeRate * Time.deltaTime, 0f)
                 : Math.Min(Stamina + staminaRechargeRate * Time.deltaTime, 1f);
             
-            #endregion
-            
-            // #region Vertical Movement
-            //
-            // if (Input.GetKeyDown(KeyCode.Space))
-            // {
-            //     rb.AddForce(Vector3.up * jumpStrength, ForceMode.Impulse);
-            // }
-            //
-            // #endregion
-            
             Vector3 v = rb.linearVelocity;
 
             float y = v.y;
@@ -159,6 +147,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             CurrentHole?.Enter(this);
+            hammer?.HitServerRpc(true);
         }
 
         _network.UpdateMovementData(new PlayerMovementData
@@ -195,6 +184,18 @@ public class PlayerController : MonoBehaviour
         CameraController.instance.LookAt(clients[_spectateIndex].PlayerObject.transform);
     }
 
+    public void SpectateSpecificPlayer(int playerId)
+    {
+        IReadOnlyList<NetworkClient> clients = NetworkManager.Singleton.ConnectedClientsList;
+        
+        while ((int)clients[_spectateIndex].ClientId != playerId)
+        {
+            _spectateIndex = (_spectateIndex + 1 + clients.Count) % clients.Count;
+        }
+        
+        CameraController.instance.LookAt(clients[_spectateIndex].PlayerObject.transform);
+    }
+    
     public void Die(int lifeCount)
     {
         ResetOnDeath();
@@ -259,7 +260,7 @@ public class PlayerController : MonoBehaviour
         {
             ResetStamina();
             _currentMoveSpeed *= 0.9f;
-            transform.localScale += Vector3.one * 0.15f;
+            transform.localScale += Vector3.one * 0.2f;
         }
     }
 

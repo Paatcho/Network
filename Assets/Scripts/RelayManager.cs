@@ -38,7 +38,7 @@ public class RelayManager : MonoBehaviour
 		try
 		{
 			// on mets 3 car on veut 3 clients l'host inclus de base donc on aura bien 4 joueur
-			Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
+			Allocation allocation = await RelayService.Instance.CreateAllocationAsync(14);
 
 			string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 

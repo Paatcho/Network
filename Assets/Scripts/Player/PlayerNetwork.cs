@@ -1,4 +1,3 @@
-using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -20,10 +19,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     public const int CheeseWinCount = 10;
     
-    [SerializeField] private PlayerController controller;
-    [SerializeField] private PlayerView view;
     [SerializeField] private NetworkTransform networkTransform;
     [SerializeField] private NetworkObject cheesePrefab;
+    [SerializeField] private NetworkObject hammerPrefab;
+    public PlayerController controller;
+    public PlayerView view;
 
     public readonly NetworkVariable<bool> exhausted = new(
         false,
@@ -60,7 +60,7 @@ public class PlayerNetwork : NetworkBehaviour
         NetworkVariableWritePermission.Owner);
     
     private int _cheeseCount = 0;
-    private int _lifeCount = 5;
+    private int _lifeCount = 3;
 
     public override void OnNetworkSpawn()
     {
@@ -107,7 +107,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (deathType != DeathType.Explosion)
         {
-            SpawnCheeseOnDeathServerRpc(_cheeseCount / 2);
+            SpawnCheeseOnDeathServerRpc((int)(_cheeseCount / 1.5f));
         }
         
         _cheeseCount = 0;
@@ -192,8 +192,37 @@ public class PlayerNetwork : NetworkBehaviour
                     WinServerRpc(WinType.Cheese);
                 }
                 break;
-            case Collectible.CollectibleType.Crumb:
+            case Collectible.CollectibleType.Hammer:
+                if (controller.hammer == null)
+                {
+                    CreatePlayerHammerServerRpc();
+                }
+                RequestCollectServerRpc(collectible);
                 break;
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void CreatePlayerHammerServerRpc()
+    {
+        NetworkObject obj = Instantiate(hammerPrefab, transform.position + Vector3.up, Quaternion.identity);
+        obj.Spawn();
+        Hammer hammer = obj.GetComponent<Hammer>();
+        
+        AttachHammerClientRpc(hammer.NetworkObject);
+    }
+
+    [ClientRpc]
+    private void AttachHammerClientRpc(NetworkObjectReference hammerReference)
+    {
+        if (!IsOwner) return;
+        
+        if (hammerReference.TryGet(out NetworkObject obj))
+        {
+            Hammer hammer = obj.GetComponent<Hammer>();
+        
+            hammer.AttachToPlayerServerRpc(NetworkObject);
+            controller.hammer = hammer;
         }
     }
 
@@ -241,28 +270,37 @@ public class PlayerNetwork : NetworkBehaviour
             win.Value = true;
             controller.ResetOnDeath();
         }
+        else
+        {
+            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>().OnLost((int)OwnerClientId);
+        }
         
+        print("sad");
         view.LaunchWinAnimation();
         LobbyManager.Instance.EnableQuitButton();
         CameraController.instance.UnlockCursor();
-
-        if (!win.Value)
-        {
-            NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>().OnLost();
-        }
     }
     
-    private void OnLost()
+    private void OnLost(int winnerId = -1)
     {
         // Dead :c
         if (!lost.Value)
         {
             CameraController.instance.SetTitle("You lost.", true);
-            CameraController.instance.SetSubtitle("All the cheese has been eaten.", true);
+            CameraController.instance.SetSubtitle("Cette souris a été meilleure.", true);
             
             lost.Value = true;
+            
             controller.CurrentMode = PlayerController.PlayerMode.Spectate;
-            controller.ChangeSpectatePlayer(1);
+            
+            if (winnerId == -1)
+            {
+                controller.ChangeSpectatePlayer(1);
+            }
+            else
+            {
+                controller.SpectateSpecificPlayer(winnerId);
+            }
             
             CheckForWinner();
             

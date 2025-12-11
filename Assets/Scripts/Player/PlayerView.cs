@@ -57,6 +57,7 @@ public class PlayerView : MonoBehaviour
         spriteRenderer.enabled = false;
         winSpriteRenderer.enabled = true;
         winSpriteRenderer.transform.localPosition += Vector3.up * winAnimations[_network.winAnimIndex.Value].height;
+        print("asasd");
         StartCoroutine(WinAnimation());
     }
     

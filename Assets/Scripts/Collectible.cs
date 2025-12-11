@@ -11,10 +11,10 @@ public class Collectible : MonoBehaviour
     public enum CollectibleType
     {
         Cheese,
-        Crumb
+        Hammer
     }
     
-    private CollectibleType _type;
+    [SerializeField] private CollectibleType type;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -29,8 +29,7 @@ public class Collectible : MonoBehaviour
 
             if (player && player.enabled)
             {
-                player.PickUpCollectible(network, _type);
-                // Destroy(gameObject); // Destroy object on the client side.
+                player.PickUpCollectible(network, type);
             }
         }
     }

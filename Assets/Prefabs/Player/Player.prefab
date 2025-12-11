@@ -5077,6 +5077,7 @@ MonoBehaviour:
   view: {fileID: 6516563303314428307}
   networkTransform: {fileID: 6343297642010879143}
   cheesePrefab: {fileID: -2400449746246543963, guid: b66a26e90defb631499cc549cd665682, type: 3}
+  hammerPrefab: {fileID: 6434010226256373281, guid: 7c8a071190a2fec4ead2cc1c0a854134, type: 3}
 --- !u!114 &2789501886289759898
 MonoBehaviour:
   m_ObjectHideFlags: 0

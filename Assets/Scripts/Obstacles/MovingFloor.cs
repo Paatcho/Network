@@ -26,7 +26,9 @@ public class MovingFloor : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     private void GoToNextPosRpc()
     {
-        transform.DOLocalMove(_target ? pos1 : pos2, moveTime).SetEase(Ease.OutQuad)
+        _moving = true;
+        
+        floor.DOLocalMove(_target ? pos1 : pos2, moveTime).SetEase(Ease.OutQuad)
             .OnComplete(() =>
             {
                 _moving = false;

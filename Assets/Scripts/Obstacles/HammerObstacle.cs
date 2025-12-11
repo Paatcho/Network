@@ -18,10 +18,12 @@ public class HammerObstacle : NetworkBehaviour
     {
         if (!NetworkManager.Singleton || !NetworkManager.Singleton.IsServer) return;
 
+        if (hammer.player) return;
+        
         if (Time.time > _nextHitTime)
         {
             _nextHitTime = Time.time + hitInterval;
-            hammer.HitServerRpc();
+            hammer.HitServerRpc(false);
         }
     }
 }
