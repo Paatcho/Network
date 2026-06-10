@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CristalMat
-  m_Shader: {fileID: -6465566751694194690, guid: 79efaa2d054ead24988a8ab1dd4a9362, type: 3}
+  m_Name: Shader_Goeey
+  m_Shader: {fileID: -6465566751694194690, guid: caa17fd546e2021468ca6596c9994722, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -24,10 +24,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _HeightMap:
-        m_Texture: {fileID: 2800000, guid: 8502f1a34bda44e4cb721236a7293bc4, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -42,28 +38,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DeepnessFactor_fresnel: 1.13
-    - _FresnelDeepBlend: -1.68
-    - _GenericNoiseIntensity: -7.47
-    - _GrazingAngle: -75.2
-    - _HeightBlendFactor: 1.97
-    - _ParallaxSteps: 30
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RefractStrength: 0.02
-    m_Colors:
-    - _AO_Mapping: {r: 0.88, g: 1, b: 0, a: 0}
-    - _ColorGlossyCristal: {r: 0.009745443, g: 0.43879384, b: 0.6886792, a: 1}
-    - _ColorRoughCristal: {r: 0.5785867, g: 0.6160333, b: 0.6226415, a: 1}
-    - _Gloss_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
-    - _Gloss_Opacity_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
-    - _Opacity_MaskMapping: {r: 0.27, g: 1.13, b: 0, a: 0}
-    - _RefractOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _RefractRemap: {r: -0.43, g: 0.78, b: 0, a: 0}
-    - _RefractScale: {r: 1.24, g: 1.72, b: 0, a: 0}
+    - _fresnelBias: 0
+    - _fresnelPower: 1
+    - _fresnelScale: 1
+    m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &4580653206017855995
+--- !u!114 &7384917406945487235
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
