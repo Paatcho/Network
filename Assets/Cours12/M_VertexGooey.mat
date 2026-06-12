@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader_Goeey
+  m_Name: M_VertexGooey
   m_Shader: {fileID: -6465566751694194690, guid: caa17fd546e2021468ca6596c9994722, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -43,6 +43,10 @@ Material:
     - _fresnelBias: 0
     - _fresnelPower: 1
     - _fresnelScale: 1
+    - _meltPuddlePower: 0
+    - _meltPuddleScale: 1
+    - _melting: 1
+    - _tinyBloat: 0.98
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -1,9 +1,6 @@
-void Fresnel_float(float3 worldNml, float3 viewDir, float power, float bias, float scale, out float fresnelMask)
+void meltingGoo_float(float3 objPos, float melting, float meltPuddleScale, float meltPuddlePower, float tinyBloat, out float3 finalPosition)
 {
-    float3 nml = normalize(worldNml);
-    float3 vd = normalize(viewDir);
-    
-    float nmlDotVd = dot(nml, vd);
-    
-    fresnelMask = bias + scale * pow(1 - nmlDotVd, power);
+    finalPosition = objPos;
+    finalPosition.g += min(0, lerp(melting - 0.5 - objPos.g, objPos.g, tinyBloat * objPos.g));
+    finalPosition.rb *= 1 + pow((1 - melting) * meltPuddleScale, meltPuddlePower);
 }

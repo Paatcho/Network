@@ -28,6 +28,14 @@ Material:
         m_Texture: {fileID: 2800000, guid: 8502f1a34bda44e4cb721236a7293bc4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_6164f6ccf90846e28055782e03ea6f1f_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: e76035e460dfdf248afa9ca591694aa4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_720dc73dd7fd4091810c8c3946bb9a13_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: e76035e460dfdf248afa9ca591694aa4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -43,6 +51,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _DeepnessFactor_fresnel: 1.13
+    - _DropletsDepth: 0.1
+    - _DropletsNoiseIntensity: 0.1
+    - _DropletsNoiseScale: 5.68
+    - _DropletsSpeed: 0.1
     - _FresnelDeepBlend: -1.68
     - _GenericNoiseIntensity: -7.47
     - _GrazingAngle: -75.2
@@ -50,11 +62,12 @@ Material:
     - _ParallaxSteps: 30
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RefractStrength: 0.02
+    - _RefractStrength: 0.03
     m_Colors:
     - _AO_Mapping: {r: 0.88, g: 1, b: 0, a: 0}
     - _ColorGlossyCristal: {r: 0.009745443, g: 0.43879384, b: 0.6886792, a: 1}
     - _ColorRoughCristal: {r: 0.5785867, g: 0.6160333, b: 0.6226415, a: 1}
+    - _DropletsScale: {r: 6.12, g: 2.61, b: 0, a: 0}
     - _Gloss_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
     - _Gloss_Opacity_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
     - _Opacity_MaskMapping: {r: 0.27, g: 1.13, b: 0, a: 0}
