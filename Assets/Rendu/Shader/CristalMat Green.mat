@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CristalMat Green
+  m_Shader: {fileID: -6465566751694194690, guid: 79efaa2d054ead24988a8ab1dd4a9362, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: _GlowColor
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _HeightMap:
+        m_Texture: {fileID: 2800000, guid: 8502f1a34bda44e4cb721236a7293bc4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_6164f6ccf90846e28055782e03ea6f1f_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: e76035e460dfdf248afa9ca591694aa4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_720dc73dd7fd4091810c8c3946bb9a13_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: e76035e460dfdf248afa9ca591694aa4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _CrackDarkenFactor: 0.3
+    - _CrackScale: 12
+    - _CrackWidth: 0.06
+    - _DeepnessFactor_fresnel: 1.13
+    - _DropletsDepth: 0.05
+    - _DropletsNoiseIntensity: 0.41
+    - _DropletsNoiseScale: 5.68
+    - _DropletsSpeed: 0.05
+    - _FresnelDeepBlend: -1.68
+    - _GenericNoiseIntensity: -7.47
+    - _GlowIntensity: 20.43
+    - _GrazingAngle: -75.2
+    - _HeightBlendFactor: 1.97
+    - _OutlineSharpness: 5.37
+    - _OutlineThickness: 1
+    - _ParallaxSteps: 30
+    - _PulseAmount: 0.17
+    - _PulseSpeed: 3.63
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _RefractStrength: 0.03
+    - _SparkleDensity: 40
+    - _SparkleScale: 90.7
+    - _SparkleSharpness: 5
+    - _SparkleSpeed: 1.5
+    - _Steps: 6
+    m_Colors:
+    - _AO_Mapping: {r: 0.88, g: 1, b: 0, a: 0}
+    - _ColorGlossyCristal: {r: 0.00784313, g: 0.6901961, b: 0.029925914, a: 1}
+    - _ColorRoughCristal: {r: 0.58149767, g: 0.62352943, b: 0.5803922, a: 1}
+    - _CrackColor: {r: 0, g: 0, b: 0, a: 1}
+    - _DropletsScale: {r: 6.12, g: 2.61, b: 0, a: 0}
+    - _Gloss_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
+    - _Gloss_Opacity_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
+    - _GlowColor: {r: 0.3482678, g: 1, b: 0.3176471, a: 1}
+    - _Opacity_MaskMapping: {r: 0.27, g: 1.13, b: 0, a: 0}
+    - _OutlineColor: {r: 0.8086283, g: 0.5518868, b: 1, a: 1}
+    - _RefractOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _RefractRemap: {r: -0.43, g: 0.78, b: 0, a: 0}
+    - _RefractScale: {r: 1.24, g: 1.72, b: 0, a: 0}
+    - _SparkleColor: {r: 0.72524416, g: 1, b: 0.7137255, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!114 &4580653206017855995
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
+  version: 10

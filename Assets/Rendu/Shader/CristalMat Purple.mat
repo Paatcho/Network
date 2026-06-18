@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CristalMat
+  m_Name: CristalMat Purple
   m_Shader: {fileID: -6465566751694194690, guid: 79efaa2d054ead24988a8ab1dd4a9362, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -20,7 +20,7 @@ Material:
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
-  m_LockedProperties: 
+  m_LockedProperties: _GlowColor
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -50,30 +50,47 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _CrackDarkenFactor: 0.3
+    - _CrackScale: 12
+    - _CrackWidth: 0.06
     - _DeepnessFactor_fresnel: 1.13
-    - _DropletsDepth: 0.1
-    - _DropletsNoiseIntensity: 0.1
+    - _DropletsDepth: 0.05
+    - _DropletsNoiseIntensity: 0.41
     - _DropletsNoiseScale: 5.68
-    - _DropletsSpeed: 0.1
+    - _DropletsSpeed: 0.05
     - _FresnelDeepBlend: -1.68
     - _GenericNoiseIntensity: -7.47
+    - _GlowIntensity: 32.75
     - _GrazingAngle: -75.2
     - _HeightBlendFactor: 1.97
+    - _OutlineSharpness: 5.37
+    - _OutlineThickness: 1
     - _ParallaxSteps: 30
+    - _PulseAmount: 0.46
+    - _PulseSpeed: 1.4
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RefractStrength: 0.03
+    - _SparkleDensity: 40
+    - _SparkleScale: 90.7
+    - _SparkleSharpness: 5
+    - _SparkleSpeed: 1.5
+    - _Steps: 6
     m_Colors:
     - _AO_Mapping: {r: 0.88, g: 1, b: 0, a: 0}
-    - _ColorGlossyCristal: {r: 0.009745443, g: 0.43879384, b: 0.6886792, a: 1}
+    - _ColorGlossyCristal: {r: 0.4493296, g: 0.00784313, b: 0.6901961, a: 1}
     - _ColorRoughCristal: {r: 0.5785867, g: 0.6160333, b: 0.6226415, a: 1}
+    - _CrackColor: {r: 0, g: 0, b: 0, a: 1}
     - _DropletsScale: {r: 6.12, g: 2.61, b: 0, a: 0}
     - _Gloss_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
     - _Gloss_Opacity_MaskMapping: {r: 0.02, g: 0.98, b: 0, a: 0}
+    - _GlowColor: {r: 1, g: 0.3160377, b: 0.94667566, a: 1}
     - _Opacity_MaskMapping: {r: 0.27, g: 1.13, b: 0, a: 0}
+    - _OutlineColor: {r: 0.8086283, g: 0.5518868, b: 1, a: 1}
     - _RefractOffset: {r: 0, g: 0, b: 0, a: 0}
     - _RefractRemap: {r: -0.43, g: 0.78, b: 0, a: 0}
     - _RefractScale: {r: 1.24, g: 1.72, b: 0, a: 0}
+    - _SparkleColor: {r: 1, g: 0.7122642, b: 0.9604151, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &4580653206017855995
